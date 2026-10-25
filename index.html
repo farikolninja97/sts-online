@@ -107,7 +107,7 @@ body.choosing-target .hand-wrap [data-play].selected-cast{border-color:#fff3b4;b
 </style></head><body><div class="backdrop"></div><div class="sparkfield"></div><div id="app"></div><div id="fx"></div>
 <script>
 'use strict';
-const VERSION='V1.04'; const SAVE_KEY='ember_descent_sts2_100';
+const VERSION='V1.05'; const SAVE_KEY='ember_descent_sts2_100';
 let S=null, modal=null, sound=false, busy=false; let uid=0; let pendingFx=[];
 const CARDS={
  strike:{name:'Strike',type:'Attack',cost:1,rarity:'Basic',desc:'Deal 6 damage.',icon:'sword',dmg:6},
@@ -201,9 +201,9 @@ function updatedCost(c){let d=spec(c);return c.tempFree?0:(d.cost<0?d.cost:d.cos
 function cardText(c){return updatedText(c)}
 function getCost(c){return updatedCost(c)}
 function cardHTML(c,mode='hand'){
- let d=spec(c), cost=updatedCost(c), playable=mode!=='hand'||(S&&S.screen==='battle'&&!busy&&(cost===-1||S.energy>=cost));
+ let d=spec(c), cost=updatedCost(c), playable=mode!=='hand'||(S&&S.screen==='battle'&&!busy&&!d.unplayable&&(cost===-1||S.energy>=cost));
  let action=mode==='hand'?'play':mode==='reward'?'rewardcard':'inspectcard';
- return `<button class="card type-${d.type.toLowerCase()} ${!playable?'disabled':''} ${mode!=='hand'?'mini':''}" ${!playable?'disabled':''} data-${action}="${escapeHTML(c.uid)}" aria-label="${escapeHTML(d.name+(c.up?' upgraded':'')+', '+d.desc)}"><span class="cost">${cost===-1?'X':cost}</span><div class="card-title">${escapeHTML(d.name)}${c.up?'+':''}</div><div class="art">${iconArt(d.icon)}</div><div class="card-type">${d.type}</div><div class="card-desc">${escapeHTML(d.desc)}</div><div class="rarity">${d.rarity}</div></button>`;
+ return `<button class="card type-${d.type.toLowerCase()} ${!playable?'disabled':''} ${mode!=='hand'?'mini':''}" ${!playable?'disabled':''} data-${action}="${escapeHTML(c.uid)}" aria-label="${escapeHTML(d.name+(c.up?' upgraded':'')+', '+d.desc)}"><span class="cost">${d.unplayable?'—':cost===-1?'X':cost}</span><div class="card-title">${escapeHTML(d.name)}${c.up?'+':''}</div><div class="art">${iconArt(d.icon)}</div><div class="card-type">${d.type}</div><div class="card-desc">${escapeHTML(d.desc)}</div><div class="rarity">${d.rarity}</div></button>`;
 }
 function log(t){S.log.unshift(t); S.log=S.log.slice(0,22)}
 const alive=()=>S.enemies.filter(e=>e.hp>0);
@@ -509,13 +509,13 @@ function applyCard(c,opt={}){if(S.screen!=='battle')return;let d=spec(c),enemy=t
  useAttack();
  if(c.key==='thrash'){let choices=S.hand.filter(x=>spec(x).type==='Attack');if(choices.length){let sacrificed=choice(choices);S.hand.splice(S.hand.indexOf(sacrificed),1);c.bonus=(c.bonus||0)+(spec(sacrificed).dmg||0);exhaustCard(sacrificed)}}
   // The repeated play resolves after the original attack's on-hit effects.
- if(d.type==='Attack'&&S.rage){S.block+=S.rage;log(`Rage: +${S.rage} Block`)}
+ if(d.type==='Attack'&&S.rage){gainBlock(S.rage,'effect');log(`Rage: +${S.rage} Block`)}
  switch(c.key){
  case 'bash':addVuln(enemy,c.up?3:2);break;
  case 'thunder':for(let e of alive())addVuln(e,1);break;
  case 'taunt':addVuln(enemy,c.up?2:1);break;
  case 'tremble':addVuln(enemy,c.up?4:3);break;
- case 'uppercut':if(enemy?.hp>0){enemy.weak+=c.up?2:1;addVuln(enemy,c.up?2:1)}break;
+ case 'uppercut':if(enemy?.hp>0){blockDebuff(enemy,'weak',c.up?2:1);addVuln(enemy,c.up?2:1)}break;
  case 'molten':if(enemy?.hp>0)enemy.vulnerable*=2;break;
  case 'setupstrike':{let n=c.up?3:2;S.strength+=n;S.tempStrength=(S.tempStrength||0)+n;break}
  case 'fightme':S.strength+=c.up?4:3;if(enemy?.hp>0)enemy.strength++;break;
@@ -796,6 +796,248 @@ CARDS.giantrock.desc='Deal 20 damage.';
 UP.giantrock={dmg:24,desc:'Deal 24 damage.'};
 const UPGRADE_KEYS=Object.keys(CARDS).filter(k=>k!=='giantrock' && !!UP[k]);
 const REWARD_UPGRADE_MISSING=SOLO_POOL.filter(k=>!UP[k]);
+
+
+/* V1.05 — Priority 2: combat-turn resolver, combat statuses, exhaust/power triggers.
+   This intentionally leaves map/encounter art and the permanent Ironclad pool untouched. */
+const COMBAT_ONLY_CARDS={
+ dazed:{name:'Dazed',type:'Status',cost:0,rarity:'Status',desc:'Unplayable. Ethereal.',icon:'storm',unplayable:true,ethereal:true},
+ void:{name:'Void',type:'Status',cost:0,rarity:'Status',desc:'Unplayable. Ethereal. Whenever drawn, lose 1 Energy.',icon:'storm',unplayable:true,ethereal:true},
+ wound:{name:'Wound',type:'Status',cost:0,rarity:'Status',desc:'Unplayable.',icon:'shield',unplayable:true},
+ burn:{name:'Burn',type:'Status',cost:0,rarity:'Status',desc:'Unplayable. At end of turn, take 2 damage if in Hand.',icon:'flame',unplayable:true},
+ slimed:{name:'Slimed',type:'Status',cost:1,rarity:'Status',desc:'Draw 1 card. Exhaust.',icon:'storm',exhaust:true},
+ decay:{name:'Decay',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. At end of turn, take 2 damage if in Hand.',icon:'flame',unplayable:true},
+ clumsy:{name:'Clumsy',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. Ethereal.',icon:'storm',unplayable:true,ethereal:true},
+ pain:{name:'Pain',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. While in hand, lose 1 HP when another card is played.',icon:'flame',unplayable:true},
+ regret:{name:'Regret',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. At end of turn, lose 1 HP per card in Hand.',icon:'flame',unplayable:true},
+ doubt:{name:'Doubt',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. At end of turn, gain 1 Weak.',icon:'storm',unplayable:true},
+ shame:{name:'Shame',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. At end of turn, gain 1 Frail.',icon:'shield',unplayable:true}
+};
+Object.assign(CARDS,COMBAT_ONLY_CARDS);
+const v105LegacyStartBattle=startBattle;
+startBattle=function(kind){v105LegacyStartBattle(kind);S.artifact=0;S.turnPhase='player';S.combatEvents=[];S.weakThisTurn=0;S.vulnerableThisTurn=0;S.frailThisTurn=0;};
+function combatEvent(event,details={}){S.combatEvents??=[];S.combatEvents.push({event,turn:S.turn,...details});if(S.combatEvents.length>100)S.combatEvents.splice(0,40)}
+function blockDebuff(target,key,amount){if(amount<=0)return 0;let artifact=target.artifact||0;if(artifact>0){target.artifact--;log('Artifact negated '+key);combatEvent('artifact-negated',{key});return 0}target[key]=(target[key]||0)+amount;return amount}
+function receiveDamage(amount,{attack=false,source=null,blockable=attack}={}){
+ let value=Math.max(0,Math.floor(amount));
+ // Colossus is already represented in the attack preview and incoming damage calculation.
+ let blocked=blockable?Math.min(S.block,value):0;
+ if(blockable)S.block-=blocked;
+ let actual=Math.min(S.hp,Math.max(0,value-blocked));S.hp-=actual;
+ if(attack&&actual>0&&S.plating>0)S.plating--;
+ if(attack&&S.flame>0&&source?.hp>0)hurtEnemy(source,S.flame,false);
+ if(actual>0){S.turnHpLoss=(S.turnHpLoss||0)+actual;S.lossCount=(S.lossCount||0)+1;
+   if(S.turnPhase==='player'){
+     if(S.powers?.rupture)S.strength+=S.powers.rupture;
+     if(S.powers?.inferno)for(const e of [...alive()])hurtEnemy(e,S.infernoDamage||6,false);
+   }
+ }
+ combatEvent(attack?'player-attacked':'hp-loss',{actual,blocked});
+ if(S.hp<=0)S.screen='death';
+ return {actual,blocked};
+}
+personalLoss=function(n){const r=receiveDamage(n,{attack:false});log(`Lost ${r.actual} HP`);return r.actual};
+// Enemy/Power Block is not modified by Dexterity or Frail; card Block is.
+gainBlock=function(amount,source='card'){
+ const modified=source==='card'?Math.floor(Math.max(0,amount+(S.dexterity||0))*(S.frail>0?.75:1)):Math.max(0,Math.floor(amount));
+ let n=modified;
+ if(source==='card'&&S.powers?.unmovable&&!S.blockGainedFromCard){n*=2;S.blockGainedFromCard=true}
+ S.block+=n;
+ if(n>0){log(`Gained ${n} Block`);combatEvent('block',{amount:n,source});if(S.powers?.juggernaut){for(let i=0;i<S.powers.juggernaut;i++)dealRawToRandom(S.juggernautDamage||6)}}
+ return n;
+};
+// Exhausting *any* combat card fires exhaust Powers and Drum of Battle's ability.
+exhaustCard=function(c){if(!c)return;S.exhaust.push(c);S.exhaustedThisTurn=(S.exhaustedThisTurn||0)+1;combatEvent('exhaust',{card:c.key});
+ if(S.powers?.feel)gainBlock(S.powers.feel,'effect');
+ if(S.powers?.darkembrace)drawCards(S.powers.darkembrace);
+ if(c.key==='drum')S.energy+=c.up?3:2;
+};
+// Hellraiser now plays the *entire Strike card*, including costs ignored, copies,
+// Attack triggers and additional effects; it is no longer a pure damage shortcut.
+let autoPlayDepth=0;
+drawCards=function(n,force=false){
+ if(!S.canDraw&&!force){log('No Draw prevents further draws');return 0}
+ let count=0;
+ for(let i=0;i<n;i++){
+  if(S.hand.length>=10){log('Hand full (10 cards)');break}
+  if(!S.draw.length){if(!S.discard.length)break;S.draw=shuffle(S.discard.splice(0));combatEvent('reshuffle')}
+  const c=S.draw.shift();if(!c)break;
+  S.hand.push(c);count++;combatEvent('draw',{card:c.key});
+  if(c.key==='void')S.energy=Math.max(0,S.energy-1);
+  if(S.powers?.hellraiser&&CARDS[c.key]?.name.includes('Strike')&&autoPlayDepth<12&&alive().length){
+   let foe=choice(alive()),oldTarget=S.target;
+   S.target=S.enemies.indexOf(foe);S.hand.splice(S.hand.indexOf(c),1);
+   autoPlayDepth++;
+   try{applyCard(c,{free:true,cost:0})}finally{autoPlayDepth--;S.target=oldTarget}
+  }
+  if(S.screen!=='battle')break;
+ }
+ return count;
+};
+const v105ApplyCard=applyCard;
+applyCard=function(c,opt={}){
+ if(!c||spec(c).unplayable)return;
+ // Applies to played cards from Hand, Cascade, Havoc and other free plays.
+ for(const pain of S.hand.filter(x=>x.key==='pain'))personalLoss(1);
+ if(S.hp<=0){checkEndBattle();return}
+ // A played Slimed has a positive, current STS2 effect: draw 1; Exhaust.
+ if(c.key==='slimed'){
+  if(S.screen!=='battle')return;
+  if(!opt.free)S.energy=Math.max(0,S.energy-(opt.cost??1));
+  S.cardsPlayed++;log('Slimed played');drawCards(1);exhaustCard(c);combatEvent('card-played',{card:'slimed'});return;
+ }
+ const wasPlaying=S.turnPhase==='player';
+ v105ApplyCard(c,opt);
+ if(wasPlaying)combatEvent('card-played',{card:c.key,upgraded:!!c.up});
+};
+// Reject unplayables BEFORE they leave the hand or consume energy.
+const v105PlayCard=playCard;
+playCard=function(id){
+ if(S?.screen!=='battle'||busy)return;
+ const c=S.hand.find(x=>x.uid===id);if(!c||spec(c).unplayable){if(c)log(`${spec(c).name} is unplayable`);return}
+ if(updatedCost(c)>S.energy&&updatedCost(c)!==-1)return;
+ v105PlayCard(id);
+};
+const v105OldStatusPlayer=statusForPlayer,v105OldStatusEnemy=statusForEnemy;
+statusForPlayer=function(){let old=v105OldStatusPlayer();if(S.artifact>0)old+=statusChip('Artifact',S.artifact);if((S.hand||[]).some(c=>CARDS[c.key]?.type==='Curse'))old+=statusChip('Cursed',S.hand.filter(c=>CARDS[c.key]?.type==='Curse').length);return old};
+statusForEnemy=function(e){let old=v105OldStatusEnemy(e);if(e.artifact>0)old+=statusChip('Artifact',e.artifact);return old};
+// Players can add/inspect sample afflictions via the in-game Combat Reference.
+function placeCombatCard(key,pile='discard'){if(!CARDS[key]||!['Status','Curse'].includes(CARDS[key].type))return null;let c=newCard(key);if(CARDS[key].type==='Curse'){S.deck.push(c);S[pile].push({...c})}else S[pile].push(c);save();render();return c}
+function decayStatus(actor,keys=['weak','vulnerable','frail']){for(let k of keys)actor[k]=Math.max(0,(actor[k]||0)-1)}
+function flushHandV105(){
+ // Ethereal cards exhaust before on-end-turn-in-hand HP-loss effects.
+ for(let c of [...S.hand])if(spec(c).ethereal){S.hand.splice(S.hand.indexOf(c),1);exhaustCard(c)}
+ const snapshot=[...S.hand],handCount=snapshot.length;
+ for(let c of snapshot){
+  if(!S.hand.includes(c))continue;
+  if(c.key==='burn'||c.key==='decay')receiveDamage(2,{attack:false,blockable:true});
+  if(c.key==='regret')personalLoss(handCount);
+  if(c.key==='doubt')blockDebuff(S,'weak',1);
+  if(c.key==='shame')blockDebuff(S,'frail',1);
+  if(S.hp<=0)break;
+ }
+ for(let c of S.hand.splice(0)){
+  // End-of-turn status/curse effects force self-discard even if Retain is set.
+  if(spec(c).retain&&!['burn','decay','regret','doubt','shame'].includes(c.key))S.hand.push(c);
+  else S.discard.push(c);
+ }
+}
+// Custom turn scheduler: player finish → enemies clear Block → left-to-right enemy
+// actions → player start Powers → draw. Avoids old enemy-Block and HP-loss bugs.
+endTurn=async function(){
+ if(busy||S.screen!=='battle')return;
+ busy=true;S.turnPhase='player';
+ try{
+  if(S.powers?.stampede){for(let i=0;i<S.powers.stampede&&alive().length;i++){
+   const attacks=S.hand.filter(c=>spec(c).type==='Attack');if(!attacks.length)break;
+   const c=choice(attacks),oldTarget=S.target;S.hand.splice(S.hand.indexOf(c),1);
+   S.target=S.enemies.indexOf(choice(alive()));applyCard(c,{free:true,cost:0});S.target=oldTarget;
+  }}
+  for(let c of [...S.exhaust.filter(c=>c.key==='howl')]){
+   S.exhaust.splice(S.exhaust.indexOf(c),1);
+   for(let enemy of [...alive()])attack(enemy,spec(c).dmg||18);
+   S.discard.push(c);
+  }
+  if(checkEndBattle())return;
+  // Player-duration debuffs tick before end-turn curses add their new stacks.
+  decayStatus(S);S.tangled=Math.max(0,(S.tangled||0)-1);
+  if(S.plating>0)gainBlock(S.plating,'effect');
+  flushHandV105();
+  if(S.tempStrength){S.strength-=S.tempStrength;S.tempStrength=0}
+  S.rage=0;S.oneTwo=0;
+  if(checkEndBattle())return;
+  S.turnPhase='enemy';
+  // Enemies lose Block at the beginning of THEIR turn, not the player's.
+  for(let e of alive())e.block=0;
+  for(let e of [...alive()]){
+   if(S.hp<=0||S.screen!=='battle')break;
+   const m=moveFor(e),kind=m.kind;log(`${e.name}: ${m.n}`);
+   render();let source=document.querySelector(`[data-enemy="${e.id}"] .avatar`);
+   if(source){source.classList.remove('striking','casting');void source.offsetWidth;source.classList.add(kind==='attack'?'striking':'casting')}
+   await sleep(240);
+   if(kind==='attack'){
+    for(let i=0;i<(m.hits||1);i++){
+     if(e.hp<=0)break;
+     const predicted=adjustedEnemyDamage(e,m);
+     const impact=receiveDamage(predicted,{attack:true,source:e});
+     log(`${e.name} attacks for ${predicted} (${impact.blocked} blocked)`);
+     queueFX('hero',impact.actual,'hit');
+     if(e.key==='stone'&&impact.actual===0&&impact.blocked>0)e.nextStun=true;
+     if(S.hp<=0)break;
+    }
+    if(m.block)e.block+=(S.asc9&&e.key==='axe'?6:S.asc9&&e.key==='whelp'?8:m.block);
+    if(m.tangled)S.tangled=(S.tangled||0)+m.tangled;
+   }
+   if(kind==='buff'){
+    if(m.strength){let amount=e.key==='feeder'&&S.asc9?16:m.strength;e.strength+=amount;queueFX(e.id,amount,'buff')}
+    if(m.block)e.block+=m.block;if(m.ritual)e.ritual+=m.ritual;
+   }
+   if(kind==='debuff'){
+    if(m.shrink)S.shrink=true;
+    if(m.weak)blockDebuff(S,'weak',m.weak);
+    if(m.frail)blockDebuff(S,'frail',m.frail);
+    if(m.vulnerable)blockDebuff(S,'vulnerable',m.vulnerable);
+   }
+   if(m.status&&COMBAT_ONLY_CARDS[m.status])for(let i=0;i<(m.statusCount||1);i++)placeCombatCard(m.status,'discard');
+   if(e.ritual>0&&e.step>0)e.strength+=e.ritual;
+   e.step++;if(e.stunned)e.stunned=false;
+   if(e.nextStun){e.stunned=true;e.nextStun=false}
+   decayStatus(e,['weak','vulnerable']);
+   if(checkEndBattle())break;
+   render();triggerFX();await sleep(105);
+  }
+  if(S.screen!=='battle')return;
+  S.turn++;S.turnPhase='player';S.energy=3;S.canDraw=true;S.cardsPlayed=0;S.attacksPlayed=0;S.flame=0;
+  S.block=S.powers?.barricade?S.block:0;
+  for(let e of alive())if(e.key==='sentinel')e.slow=0;
+  if(S.powers?.demon)S.strength+=S.powers.demon;
+  S.exhaustedThisTurn=0;S.turnHpLoss=0;S.blockGainedFromCard=false;
+  for(let pile of [S.draw,S.discard,S.hand,S.exhaust])for(let card of pile)card.tempFree=false;
+  if(S.powers?.pyre)S.energy+=S.powers.pyre;
+  if(S.powers?.crimson){personalLoss(S.powers.crimson);if(S.hp>0)gainBlock(S.crimsonBlock||7*S.powers.crimson,'effect')}
+  if(S.powers?.inferno&&S.hp>0)personalLoss(S.powers.inferno);
+  if(S.hp<=0){checkEndBattle();return}
+  if(S.powers?.aggression){for(let i=0;i<S.powers.aggression;i++){
+   let cards=S.discard.filter(c=>spec(c).type==='Attack');if(cards.length&&S.hand.length<10){let c=choice(cards);S.discard.splice(S.discard.indexOf(c),1);if(UP[c.key])c.up=true;S.hand.push(c)}
+  }}
+  for(let e of S.enemies){if(e.tempStrengthDown){e.strength+=e.tempStrengthDown;e.tempStrengthDown=0}}
+  S.colossus=0;
+  drawCards(5,true);log('Your turn');
+ }finally{busy=false;save();render();triggerFX()}
+};
+// Avoid double-rounding when Weak and Vulnerable both affect one hit.
+// Strength is added before both multipliers, and floor happens once per hit.
+dmgCard=function(e,base){
+ let multiplier=(S.weak>0?.75:1)*(S.shrink?.7:1)*(e.vulnerable>0?(S.powers?.cruelty?(S.crueltyBonus||1.75):1.5):1);
+ if(e.key==='sentinel')multiplier*=1+(e.slow||0)*.1;
+ return Math.max(0,Math.floor(Math.max(0,base+(S.strength||0))*multiplier));
+};
+adjustedEnemyDamage=function(e,m){
+ if(m.kind!=='attack')return 0;
+ let base=S.asc9&&m.ascDmg!=null?m.ascDmg:(m.dmg||0);
+ if(S.asc9&&m.ascDmg==null){const over={mite:{Chomp:8,Stomp:14},marauder:{Crush:8},axe:{'Guarded Swing':6,'Overhead Smash':13},vine:{'Vine Swipe':7,Grasp:9,Gorge:18},archer:{'Piercing Bolt':16},acolyte:{'Dark Strike':11},whelp:{Bite:8},silk:{Thrash:5},stone:{Headbutt:16}};base=over[e.key]?.[m.n]??base}
+ const multiplier=(e.weak>0?.75:1)*(S.vulnerable>0?1.5:1)*(S.colossus&&e.vulnerable>0?.5:1);
+ return Math.max(0,Math.floor(Math.max(0,base+(e.strength||0))*multiplier));
+};
+addVuln=function(e,n){if(!e||e.hp<=0)return;if(blockDebuff(e,'vulnerable',n)&&S.powers?.vicious)drawCards(S.powers.vicious)};
+// A glossary accessible during combat, documenting supported afflictions.
+const v105Act=act;act=function(action){if(action==='combatref'){modal={type:'combatref'};render();return}v105Act(action)};
+const v105ModalHTML=modalHTML;modalHTML=function(){if(modal?.type==='combatref'){
+ return `<div class="overlay"><section class="modal" role="dialog" aria-modal="true" aria-label="Combat reference"><button class="litebtn close" data-action="close">✕</button><h2>Combat rules · V1.05</h2><p class="note">Attack damage: (base + Strength), then Weak ×0.75, Vulnerable ×1.5; calculated per hit before Block. Enemy Block clears at the start of its own turn.</p><div class="pile-list">${Object.values(COMBAT_ONLY_CARDS).map(c=>`<div class="pile-entry"><span>✦</span><b>${escapeHTML(c.name)}</b><small>${escapeHTML(c.desc)}</small></div>`).join('')}</div><p class="note">These Statuses are combat-only. Curses persist in your deck. This reference is not a card reward pool.</p><button class="btn" data-action="close">Return to combat</button></section></div>`;
+ }return v105ModalHTML()};
+const v105BattleScreen=battleScreen;battleScreen=function(){return v105BattleScreen().replace('<div class="combat-meta">','<div class="combat-meta">').replace('<div class="hint">Choose a target, play a card, then end the turn</div>','<button class="litebtn combat-guide" data-action="combatref">Combat rules &amp; statuses</button>')};
+// Original altar option exercises persistent Curse behavior in normal solo runs.
+const v105EventScreen=eventScreen;
+eventScreen=function(){return v105EventScreen().replace('<button class="choice" data-event="none">',
+ '<button class="choice" data-event="curse"><span class="choiceicon">☽</span><span class="choicetitle">Cursed bargain</span><span class="choicedesc">Gain 120 gold. Receive a random permanent Curse.</span></button><button class="choice" data-event="none">')};
+document.addEventListener('click',evt=>{
+ const button=evt.target.closest('[data-event="curse"]');if(!button)return;
+ evt.preventDefault();evt.stopImmediatePropagation();
+ if(S?.screen!=='event')return;
+ let c=newCard(choice(['regret','doubt','shame','pain','decay']));S.deck.push(c);S.gold+=120;
+ showCardReveal(c,'Cursed bargain','Added to your permanent deck. Curse effects apply during future combats.','route');
+},true);
+
 
  try{load()}catch(e){console.warn('Save unavailable',e)}
 // A future release can migrate saves without changing the game engine.
