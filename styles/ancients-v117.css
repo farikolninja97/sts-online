@@ -1,0 +1,31 @@
+/* V1.17 Ancient entry: independent from battle viewport/layout. */
+.ed117-ancient-page{padding:20px clamp(14px,3vw,42px) 36px;min-height:calc(100vh - 110px);display:flex;align-items:center;justify-content:center;overflow:auto}
+.ed117-ancient-panel{width:min(1150px,100%);min-height:min(730px,80vh);display:grid;grid-template-columns:minmax(240px,.85fr) minmax(0,1.15fr);background:radial-gradient(circle at 22% 36%,#3e293b 0,transparent 49%),linear-gradient(135deg,#121a27,#101018 65%,#28191c);border:2px solid #907353;border-radius:18px;box-shadow:0 16px 70px #05080ddd,inset 0 0 0 6px #dba75f12;overflow:hidden;position:relative}
+.ed117-ancient-hero{min-height:460px;display:grid;place-items:center;position:relative;background:radial-gradient(circle at 50% 55%,#bc874b3b,transparent 58%),radial-gradient(circle at 45% 43%,#8567aa44,transparent 70%);overflow:hidden}
+.ed117-ancient-hero:after{content:'';position:absolute;bottom:0;left:5%;width:90%;height:23%;background:linear-gradient(0deg,#18151e,transparent);pointer-events:none}
+.ed117-halo{position:absolute;border:1px solid #e1ae696b;width:280px;height:280px;border-radius:50%;box-shadow:0 0 0 22px #dba65a0b,0 0 0 65px #dba65a0a,0 0 85px #dba65a35;transform:rotate(-22deg)}
+.ed117-halo:before,.ed117-halo:after{content:'✧';color:#d5b98d;font-size:28px;position:absolute;top:0;left:15px}
+.ed117-halo:after{top:auto;bottom:12px;left:auto;right:9px}
+.ed117-sigil{font-size:clamp(90px,13vw,178px);position:relative;z-index:1;filter:drop-shadow(0 12px 22px #0009);animation:ed117float 5s ease-in-out infinite;user-select:none}
+@keyframes ed117float{50%{transform:translateY(-12px)}}
+.ed117-ancient-content{padding:clamp(18px,3vw,46px);display:flex;flex-direction:column;justify-content:center;gap:10px}
+.ed117-ancient-content h1{font-family:Georgia,serif;font-size:clamp(42px,5vw,76px);color:#f5deb2;line-height:1;margin:0;letter-spacing:.03em;text-shadow:0 3px 10px #0009}
+.ed117-subtitle{font:small-caps 18px Georgia,serif;letter-spacing:.12em;color:#cdb795}
+.ed117-quote{font:italic 16px Georgia,serif;color:#e4d5bd99;margin:4px 0}
+.ed117-heal{margin:6px 0;color:#a5d8aa;font-size:13px}
+.ed117-ancient-choices{display:grid;gap:9px;margin-top:5px}
+.ed117-offer{color:#ede5d9;display:flex;gap:14px;align-items:center;width:100%;text-align:left;border:1px solid #75664e;background:#242631;border-radius:12px;padding:12px 14px;min-height:96px;cursor:pointer;box-shadow:inset 0 1px #ffffff10;transition:transform .12s,border-color .15s,background .15s}
+.ed117-offer:hover,.ed117-offer:focus-visible{transform:translateY(-1px);border-color:#dbba83;background:#30313e;outline:none}
+.ed117-offer.selected{background:#48402f;border:2px solid #ecc57f;box-shadow:0 0 0 2px #e2ac4822}
+.ed117-offer.risky{background:#31232d;border-color:#8c626c}
+.ed117-offer.risky.selected{border-color:#e8a5ae;background:#4d303a}
+.ed117-relic-icon{font-size:35px;background:radial-gradient(circle,#6c513d,#2b2830);width:63px;height:63px;flex-shrink:0;display:grid;place-items:center;border:1px solid #ae8c65;border-radius:8px}
+.ed117-offer-text{min-width:0;display:grid;gap:3px;flex:1}
+.ed117-offer-text strong{font-family:Georgia,serif;font-size:19px;color:#f1dfbd}
+.ed117-offer-text small{font-size:10px;color:#b9a488;font-weight:bold;letter-spacing:.12em}
+.ed117-offer-text>span{font-size:13px;line-height:1.5;color:#e4d9c8}
+.ed117-check{font-size:25px;color:#ecc57f}
+.ed117-ancient-actions{display:grid;gap:9px;margin-top:10px}.ed117-confirm{min-height:48px}
+.ed117-ancient-actions .note{font-size:12px;margin:0;color:#bfb09b}
+@media(max-width:760px){.ed117-ancient-page{display:block;padding:8px 10px 20px;min-height:auto}.ed117-ancient-panel{grid-template-columns:1fr;min-height:auto}.ed117-ancient-hero{min-height:128px}.ed117-sigil{font-size:80px}.ed117-halo{width:125px;height:125px}.ed117-ancient-content{padding:16px;gap:6px}.ed117-ancient-content h1{font-size:40px}.ed117-subtitle{font-size:14px}.ed117-quote{font-size:13px;margin:0}.ed117-heal{font-size:12px}.ed117-offer{min-height:84px;padding:9px;gap:9px}.ed117-relic-icon{width:49px;height:52px;font-size:28px}.ed117-offer-text strong{font-size:16px}.ed117-offer-text>span{font-size:12px}.ed117-ancient-actions{margin-top:3px}}
+@media(prefers-reduced-motion:reduce){.ed117-sigil{animation:none}.ed117-offer{transition:none}}

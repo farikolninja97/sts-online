@@ -8,6 +8,7 @@ const COMBAT_ONLY_CARDS={
  burn:{name:'Burn',type:'Status',cost:0,rarity:'Status',desc:'Unplayable. At end of turn, take 2 damage if in Hand.',icon:'flame',unplayable:true},
  slimed:{name:'Slimed',type:'Status',cost:1,rarity:'Status',desc:'Draw 1 card. Exhaust.',icon:'storm',exhaust:true},
  decay:{name:'Decay',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. At end of turn, take 2 damage if in Hand.',icon:'flame',unplayable:true},
+ greed:{name:'Greed',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. Eternal. Cannot be removed or transformed from your permanent deck.',icon:'flame',unplayable:true,eternal:true},
  clumsy:{name:'Clumsy',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. Ethereal.',icon:'storm',unplayable:true,ethereal:true},
  pain:{name:'Pain',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. While in hand, lose 1 HP when another card is played.',icon:'flame',unplayable:true},
  regret:{name:'Regret',type:'Curse',cost:0,rarity:'Curse',desc:'Unplayable. At end of turn, lose 1 HP per card in Hand.',icon:'flame',unplayable:true},
