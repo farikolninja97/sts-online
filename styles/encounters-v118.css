@@ -1,0 +1,13 @@
+.ed118-phase-inline{color:#f0ac96;font-style:normal;font-size:.8em} .ed118-intel-button{appearance:none;border:1px solid #5f778c;color:#d5e8ee;border-radius:99px;background:#152232;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer}
+.ed118-intel-button:focus-visible{outline:3px solid #eabe70;outline-offset:2px}
+.ed118-intel-modal{max-width:760px;max-height:min(85dvh,850px);overflow:auto}
+.ed118-intel-unit{padding:14px;margin:10px 0 14px;background:#111d2b;border:1px solid #48576c;border-radius:12px}
+.ed118-intel-unit h3{font-size:18px;margin:0 0 6px;color:#f4dbac}.ed118-intel-unit h3 span{font:600 10px sans-serif;letter-spacing:.08em;color:#d4a576;padding-left:7px}
+.ed118-intel-unit p{margin:6px 0;color:#e4d9c8;font-size:13px}.ed118-move-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:12px}
+.ed118-move-list>div{display:flex;flex-direction:column;gap:4px;padding:9px;border:1px solid #4a5868;border-radius:9px;background:#1d293a}
+.ed118-move-list strong{font-size:12px;color:#f9e0b9}.ed118-move-list small{font-size:11px;line-height:1.4;color:#c4cbd0}
+@media(max-width:520px){body.oncombat .ed118-intel-button{min-width:48px;flex:0 0 48px;padding:3px 5px;font-size:10px}.ed118-phase-inline{display:none}.ed118-intel-button{padding:5px 8px;font-size:11px}.ed118-move-list{grid-template-columns:1fr}.ed118-intel-modal{max-height:84dvh}}
+
+/* A visible combat-specific phase cue that remains present on narrow phones. */
+.enemy-wrap[data-boss-phase="2"] .foe-sprite{filter:drop-shadow(0 0 16px #d24f58cc) saturate(1.2)}
+.enemy-wrap[data-boss-phase="2"] .foe-title:after{content:"  · PHASE II";color:#f6a192;font-size:9px;white-space:nowrap}

@@ -24,6 +24,9 @@ endTurn=async function(){
   S.rage=0;S.oneTwo=0;
   for(const e of S.enemies){if(e.tempStrengthDown){e.strength+=e.tempStrengthDown;e.tempStrengthDown=0}}
   if(checkEndBattle())return;
+  // V1.19: freeze the player's actions and defenses before enemy attacks can
+  // alter Block or card counters; intent and execution share this snapshot.
+  if(typeof ed119BeforeEnemyPhase==='function')ed119BeforeEnemyPhase();
   S.turnPhase='enemy';
   // Enemies lose Block at the beginning of THEIR turn, not the player's.
   for(let e of alive())e.block=0;
@@ -65,6 +68,8 @@ endTurn=async function(){
     if(m.vulnerable)blockDebuff(S,'vulnerable',m.vulnerable);
    }
    if(m.status&&COMBAT_ONLY_CARDS[m.status])for(let i=0;i<(m.statusCount||1);i++)placeCombatCard(m.status,'discard');
+   if(typeof ed118ResolveEnemyMove==='function')ed118ResolveEnemyMove(e,m);
+   if(typeof ed119ResolveEnemyMove==='function')ed119ResolveEnemyMove(e,m);
    if(e.ritual>0&&e.step>0)e.strength+=e.ritual;
    e.step++;if(e.stunned)e.stunned=false;
    if(e.nextStun){e.stunned=true;e.nextStun=false}
@@ -73,7 +78,11 @@ endTurn=async function(){
    render();triggerFX();await sleep(105);
   }
   if(S.screen!=='battle')return;
-  S.turn++;S.turnPhase='player';S.energy=3;S.energyLocked=false;S.canDraw=true;S.cardsPlayed=0;S.attacksPlayed=0;S.flame=0;
+  const completedTurn=S.enemyResponse?{...S.enemyResponse}:null;
+  S.turn++;S.turnPhase='player';
+  if(typeof ed120PlanAll==='function')ed120PlanAll(completedTurn);
+  S.enemyResponse=null;
+  S.energy=3;S.energyLocked=false;S.canDraw=true;S.cardsPlayed=0;S.attacksPlayed=0;S.flame=0;
   S.block=S.powers?.barricade?S.block:0;
   for(let e of alive())if(e.key==='sentinel')e.slow=0;
   if(S.powers?.demon)S.strength+=S.powers.demon;

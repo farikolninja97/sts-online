@@ -2,7 +2,7 @@
 function log(t){S.log.unshift(t); S.log=S.log.slice(0,22)}
 const alive=()=>S.enemies.filter(e=>e.hp>0);
 const targetEnemy=()=>S.enemies[S.target]?.hp>0?S.enemies[S.target]:alive()[0];
-const moveFor=(e)=>{
+let moveFor=(e)=>{
  if(e.stunned){return {n:'Stunned',kind:'sleep',stunned:true}}
  if(e.key==='sentinel')return e.step===0?ENEMIES.sentinel.moves[0]:e.step===1?ENEMIES.sentinel.moves[1]:ENEMIES.sentinel.moves[2];
  if(e.key==='feeder')return e.step===0?ENEMIES.feeder.moves[0]:e.step===1?ENEMIES.feeder.moves[1]:ENEMIES.feeder.moves[2];

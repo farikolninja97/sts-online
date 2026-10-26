@@ -1,0 +1,6 @@
+/* V1.20 visible decision models. Layout stays inside existing Intel modal. */
+.ed120-ai-panel{border:1px solid rgba(179,205,242,.25);border-radius:12px;background:rgba(15,25,41,.72);padding:12px 13px;margin:12px 0}
+.ed120-ai-panel>strong{color:#e4c08a;letter-spacing:.02em}
+.ed120-ai-panel .note{margin:5px 0 9px}
+.ed120-ai-line{font-size:.82rem;color:#d6dfe9;line-height:1.4;margin:6px 0;padding-top:6px;border-top:1px solid rgba(255,255,255,.08)}
+@media(max-width:440px){.ed120-ai-panel{padding:10px}.ed120-ai-line{font-size:.76rem}}

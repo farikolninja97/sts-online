@@ -1,0 +1,26 @@
+/* V1.19: Boss atmospheres and readable attack/reaction telegraphs. Purely visual. */
+.arena.ed119-boss-field{border-color:#ad684f9c;box-shadow:inset 0 0 65px #020607cb,0 12px 30px #0008,0 0 0 1px #d18b5440}
+.arena.ed119-ashen_monarch{background:radial-gradient(ellipse at 65% 35%,#bb532b27,transparent 55%),linear-gradient(140deg,#2c1d26,#161c24 70%,#161319)}
+.arena.ed119-rootmaw{background:radial-gradient(ellipse at 72% 35%,#4a9c4526,transparent 55%),linear-gradient(140deg,#172e27,#181f28 70%,#161919)}
+.arena.ed119-shard_matriarch{background:radial-gradient(ellipse at 72% 35%,#8d82ee32,transparent 55%),linear-gradient(140deg,#25213c,#171b2c 70%,#181822)}
+.arena.ed119-forge_tyrant{background:radial-gradient(ellipse at 65% 35%,#f078292d,transparent 55%),linear-gradient(140deg,#332220,#20202b 70%,#191c26)}
+.arena.ed119-hollow_regent{background:radial-gradient(ellipse at 70% 35%,#7cbad52e,transparent 55%),linear-gradient(140deg,#182d3e,#141b28 70%,#111927)}
+.arena.ed119-eclipse_engine{background:radial-gradient(ellipse at 68% 35%,#a13bbd34,transparent 55%),linear-gradient(140deg,#211c38,#1a182b 70%,#1a111f)}
+.ed119-intent-signal{display:inline-block;color:#ffdf9c;background:#50301fcf;border:1px solid #c99b6788;padding:2px 4px;border-radius:5px;white-space:nowrap;font:800 9px/1.1 system-ui,sans-serif;letter-spacing:.04em;animation:ed119-intent-breathe 1.9s ease-in-out infinite}
+@keyframes ed119-intent-breathe{50%{box-shadow:0 0 12px #e8a06b91;border-color:#f3bb7f}}
+.enemy-wrap[data-boss-tags] .foe-title:before{content:attr(data-boss-tags);display:block;color:#f5c18a;text-shadow:0 0 5px #6e3c1d;letter-spacing:.01em;font:800 9px/1.2 system-ui,sans-serif;margin-bottom:2px}
+.enemy-wrap[data-boss-tags] .foe-title{min-height:27px}
+.enemy-wrap[data-boss-phase="2"] .foe-sprite{animation:ed119-boss-pulse 2.6s ease-in-out infinite alternate}
+@keyframes ed119-boss-pulse{to{filter:drop-shadow(0 0 25px #eb5e66e6) saturate(1.55)}}
+.ed119-burst{position:absolute;z-index:22;top:25%;left:50%;transform:translateX(-50%);pointer-events:none;text-align:center;border-radius:10px;border:2px solid #ffcb7c;box-shadow:0 0 35px #ff925c7c,inset 0 0 25px #ea855b39;background:#201821e9;padding:13px 19px;white-space:nowrap;color:#ffe8b7;font:900 clamp(16px,3vw,33px)/1.2 system-ui,sans-serif;letter-spacing:.14em;text-shadow:0 0 14px #f2a25d;animation:ed119-burst-pop 1.05s ease-out forwards}
+.ed119-burst.phase{background:#481e2ce8;border-color:#fa8295;color:#ffccd4;box-shadow:0 0 30px #d53e76c2}
+.ed119-burst.react{background:#312a1bdc;border-color:#e6b56b}
+.ed119-burst.core{background:#332049ed;border-color:#bba8fb;color:#f1caff;box-shadow:0 0 31px #ad5ac7ad}
+@keyframes ed119-burst-pop{0%{opacity:0;transform:translate(-50%,20px) scale(.76);filter:blur(8px)}23%{opacity:1;transform:translate(-50%,-5px) scale(1.07);filter:blur(0)}60%{opacity:1;transform:translate(-50%,-7px) scale(1)}100%{opacity:0;transform:translate(-50%,-22px) scale(1.07)}}
+.ed119-intel-tip{background:#253348;color:#e9cfa0;border:1px solid #927960;padding:9px 12px;border-radius:8px;font:12px/1.5 system-ui,sans-serif;margin:7px 0}
+.ed119-intel-tip strong{color:#ffe4b2}
+.ed119-aim-line{position:fixed;z-index:20;height:3px;transform-origin:0 50%;pointer-events:none;background:linear-gradient(90deg,#ffdbaa11,#ffac74aa,#ffe1ad);box-shadow:0 0 14px 3px #ffa2685a;animation:ed119-aim-travel .7s ease-out both}
+.ed119-aim-line.beam{height:8px;background:linear-gradient(90deg,#df7fe155,#d5a3ff,#f7e6ff);box-shadow:0 0 20px 6px #ae68d7aa}
+@keyframes ed119-aim-travel{0%{opacity:0;clip-path:inset(0 100% 0 0)}20%{opacity:1}80%{opacity:.95;clip-path:inset(0 0 0 0)}100%{opacity:0}}
+@media(max-width:600px){.ed119-intent-signal{font-size:8px;padding:2px}.enemy-wrap[data-boss-tags] .foe-title:before{font-size:8px}.ed119-burst{top:34%;max-width:92%;padding:10px 12px;letter-spacing:.08em;font-size:17px}.enemy-wrap[data-boss-tags] .foe-title{min-height:22px}}
+@media(prefers-reduced-motion:reduce){.ed119-intent-signal,.enemy-wrap[data-boss-phase="2"] .foe-sprite,.ed119-burst{animation:none!important}.ed119-burst,.ed119-aim-line{display:none}}
