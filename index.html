@@ -143,10 +143,128 @@ body.vfx-shake .arena{animation:vfx-arena-jolt .27s ease-out both}
 @media(max-width:600px){.vfx-impact{width:75px;height:75px}.vfx-number{font-size:24px}.vfx-block{width:45px;height:45px}.vfx-block:before{font-size:19px}}
 @media(prefers-reduced-motion:reduce){.vfx-impact,.vfx-number,.vfx-death,.vfx-burst,.vfx-spark,.vfx-block{animation-duration:.12s!important;transition:none!important}body.vfx-shake .arena{animation:none!important}}
 
+
+/* V1.07 — Slay-the-Spire-inspired Block HUD (drawn locally; no external assets). */
+.combatant .combat-vitals{position:relative;z-index:4;display:flex;align-items:center;width:min(210px,97%);min-height:29px;margin-top:3px;flex:0 0 auto}
+.combat-vitals .healthbar{width:calc(100% - 17px);flex:1;min-width:0;margin:0 0 0 17px;height:20px}
+.combat-vitals .healthbar .hptxt{line-height:18px}
+.block-shield{position:absolute;z-index:5;width:38px;height:43px;left:-3px;top:50%;transform:translateY(-50%);display:grid;place-items:center;pointer-events:auto;filter:drop-shadow(0 2px 5px #000c)}
+.block-shield svg{width:100%;height:100%;overflow:visible;display:block}
+.block-shield-value{position:absolute;top:49%;left:50%;transform:translate(-50%,-50%);color:#fff;font:900 16px/1 system-ui,sans-serif;text-shadow:0 2px 3px #000,0 0 5px #032b4c;font-variant-numeric:tabular-nums}
+.block-shield.block-present{filter:drop-shadow(0 0 7px #83cfff8a) drop-shadow(0 2px 5px #000b)}
+.block-shield.block-empty{opacity:.55;filter:grayscale(.55) drop-shadow(0 2px 4px #0009)}
+@media(max-width:600px){
+ body.oncombat .combatant .combat-vitals{width:min(210px,98%);min-height:23px;margin-top:1px}
+ body.oncombat .combat-vitals .healthbar{width:calc(100% - 12px);margin-left:12px;height:16px}
+ body.oncombat .combat-vitals .healthbar .hptxt{font-size:9px;line-height:14px}
+ body.oncombat .block-shield{width:29px;height:33px;left:-3px}
+ body.oncombat .block-shield-value{font-size:12px}
+}
+@media(max-width:390px){body.oncombat .block-shield{width:26px;height:30px}body.oncombat .block-shield-value{font-size:11px}}
+
+
+/* V1.08 — accessible swipeable full hand */
+.hand-area{width:100%;min-width:0;height:269px;min-height:0;display:flex;flex-direction:column;gap:3px;position:relative}
+.hand-tools{height:29px;flex:0 0 29px;display:flex;align-items:center;justify-content:center;gap:6px;font:700 11px/1.2 system-ui,sans-serif;color:#eed2a1}
+.hand-count{white-space:nowrap;letter-spacing:.1em}.hand-count b{color:#fff}
+.hand-nav,.hand-view{border:1px solid #b28a58;background:#1c2e39;color:#f0cf96;border-radius:6px;min-height:27px;padding:3px 11px;font:700 12px system-ui,sans-serif;cursor:pointer}
+.hand-nav{font-size:21px;line-height:14px;min-width:36px}
+.hand-nav:active,.hand-view:active{background:#42556b}
+.hand-hint{font:10px system-ui,sans-serif;color:#b9bbb8}
+.hand-area .hand-wrap{height:calc(100% - 32px);min-height:0;max-height:none;max-width:100%;gap:9px;display:flex;overflow-x:auto!important;overflow-y:hidden!important;justify-content:flex-start!important;align-items:center;flex-wrap:nowrap;scrollbar-width:thin;scrollbar-color:#c59d5c #18222f;scroll-snap-type:x proximity;padding:2px 8px 4px!important;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;touch-action:pan-x}
+.hand-area .hand-wrap .card{flex-shrink:0!important;margin-left:0!important;scroll-snap-align:start;touch-action:pan-x;z-index:1!important}
+.hand-area .hand-wrap .card:focus-visible{outline:3px solid #fce5aa;outline-offset:1px}
+.v108-hand-modal{max-width:650px!important;max-height:min(92dvh,760px)!important;display:flex;flex-direction:column}
+.v108-hand-list{display:grid;grid-template-columns:1fr;gap:7px;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px;max-height:62dvh}
+.v108-hand-item{display:grid;grid-template-columns:44px 1fr 26px;align-items:center;gap:11px;text-align:left;background:linear-gradient(#23313e,#172330);border:1px solid #7e725d;border-radius:10px;color:#f1e4cc;padding:11px;min-height:74px}
+.v108-hand-item b{font-size:16px}.v108-hand-item small{display:block;color:#d0b789;font:11px system-ui,sans-serif;margin:3px 0}
+.v108-hand-desc{font:12px/1.3 system-ui,sans-serif;color:#d6d8d6}
+.v108-hand-cost{font:bold 21px Georgia,serif;color:#f2d5a0;text-align:center;background:#33404f;border:1px solid #aa885e;border-radius:50%;width:39px;height:39px;line-height:37px}
+.v108-hand-eye{color:#edc37a;font-size:25px}
+.v108-inspect-modal{width:min(640px,97vw)!important;max-height:92dvh!important;overflow-y:auto!important}
+.v108-inspect-layout{display:grid;grid-template-columns:185px minmax(0,1fr);align-items:center;gap:22px;margin-top:10px}
+.v108-inspect-art{display:flex;justify-content:center}.v108-inspect-art .card{flex:none;width:175px;height:246px;pointer-events:none;cursor:default}
+.v108-inspect-info{min-width:0}.v108-inspect-info h2{font-size:29px;margin:0 0 12px}.v108-card-text{font:16px/1.55 system-ui,sans-serif;color:#fff1db}
+.v108-inspect-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}.v108-inspect-actions .btn{padding:10px 14px}
+body.dragging-any-card .arena{box-shadow:inset 0 0 20px #e6bb6a65,0 0 0 2px #cfa361b8}
+@media(max-width:600px){
+ body.oncombat .combat{grid-template-rows:20px minmax(110px,1fr) auto 168px}
+ body.oncombat .hand-area{height:168px;max-height:168px}
+ body.oncombat .hand-tools{height:26px;flex-basis:26px;gap:5px;justify-content:center}
+ body.oncombat .hand-hint{display:none}
+ body.oncombat .hand-view{padding:4px 8px}
+ body.oncombat .hand-nav{min-width:30px;padding:2px 6px}
+ body.oncombat .hand-area .hand-wrap{height:139px!important;max-height:139px!important;min-height:0;gap:8px;padding:1px 8px 3px!important;overflow-x:auto!important;overflow-y:hidden!important;justify-content:flex-start!important;align-items:center;touch-action:pan-x!important}
+ body.oncombat .hand-area .hand-wrap .card{margin-left:0!important;flex:0 0 100px!important;width:100px!important;height:132px;touch-action:pan-x!important;z-index:1!important}
+ .v108-inspect-layout{grid-template-columns:140px minmax(0,1fr);gap:10px}
+ .v108-inspect-art .card{width:130px;height:205px}
+ .v108-inspect-info h2{font-size:20px;margin-bottom:4px}.v108-card-text{font-size:13px;line-height:1.35}
+ .v108-inspect-actions .btn{font-size:11px;padding:9px}
+}
+@media(max-width:600px) and (max-height:720px){
+ body.oncombat .combat{grid-template-rows:17px minmax(80px,1fr) auto 136px}
+ body.oncombat .hand-area{height:136px;max-height:136px}
+ body.oncombat .hand-tools{height:24px;flex-basis:24px}
+ body.oncombat .hand-area .hand-wrap{height:110px!important;max-height:110px!important}
+ body.oncombat .hand-area .hand-wrap .card{width:86px!important;flex-basis:86px!important;height:103px}
+ .v108-inspect-layout{grid-template-columns:110px minmax(0,1fr)}
+ .v108-inspect-art .card{width:105px;height:165px}.v108-card-text{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){.hand-area .hand-wrap{scroll-behavior:auto}}
+
+
+/* V1.08 final mobile polish */
+.v108-hand-modal{position:relative;padding-top:52px!important}
+.v108-hand-modal>.close{position:absolute;right:12px;top:10px;float:none!important;width:36px;height:32px;padding:4px;display:grid;place-items:center}
+.v108-hand-modal .v108-hand-list{flex:1 1 auto;max-height:unset}
+.v108-hand-modal>.btn{flex-shrink:0}
+.v108-hand-item>span:nth-child(2){min-width:0}
+.v108-hand-item .v108-hand-desc{display:block}
+@media(max-width:600px){
+ body.oncombat .combat-meta .combat-guide{flex:0 0 33px;width:33px;min-width:33px;height:22px;padding:0;overflow:hidden;font-size:0;line-height:22px}
+ body.oncombat .combat-meta .combat-guide::after{content:'ⓘ';font-size:15px;color:#f4c98b}
+}
+
+/* V1.09 — live damage in card art and expanded target comparison. */
+.card .art{position:relative}
+.v109-damage{position:absolute;z-index:4;right:1px;bottom:1px;display:flex;gap:2px;align-items:center;padding:3px 5px;border-radius:7px 2px 5px 2px;background:linear-gradient(110deg,#4b251aef,#16251bef);border:1px solid #e5bd6eb8;color:#fff3d0;font:900 15px/1.1 system-ui,sans-serif;text-shadow:0 1px 2px #000c;box-shadow:0 2px 7px #0008;pointer-events:none}
+.v109-damage b{font:inherit;font-variant-numeric:tabular-nums}.v109-damage em{font:900 11px system-ui,sans-serif;font-style:normal;color:#f1ce91}
+.v109-damage small{font:700 8px/1 system-ui,sans-serif;color:#9febca;letter-spacing:.035em}
+.v109-live-figure{color:#aef6bc;text-shadow:0 0 5px #205f3e;font-weight:950;font-variant-numeric:tabular-nums}
+.v109-live-sub{color:#d3cd9f;font-size:.87em}
+.v109-breakdown{margin:8px 0;padding:11px;background:linear-gradient(155deg,#132533,#211c24);border:1px solid #c7a268;border-radius:10px}
+.v109-breakdown-head{color:#f5d296;font:800 10px/1.3 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase}
+.v109-big-number{font:900 28px/1.3 system-ui,sans-serif;color:#b9f1c8;font-variant-numeric:tabular-nums;margin:5px 0}
+.v109-big-number span{color:#f4d49d;font-size:20px}
+.v109-totals{display:flex;gap:8px;flex-wrap:wrap;font:11px/1.4 system-ui,sans-serif;color:#bfcbd1}
+.v109-totals span{background:#101720;border:1px solid #3e5660;border-radius:5px;padding:4px 7px}.v109-totals b{color:#fff}
+.v109-modifiers{font:11px/1.4 system-ui,sans-serif;color:#c9d8b6;margin:8px 0}
+.v109-targets{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.v109-foe-option{background:#182331;border:1px solid #59677a;color:#f3e1c1;border-radius:7px;padding:6px 8px;display:flex;flex-direction:column;text-align:left;gap:2px;min-width:100px;flex:1 1 100px;max-width:165px;font:700 11px/1.25 system-ui,sans-serif}
+.v109-foe-option b{font-size:16px;font-variant-numeric:tabular-nums}.v109-foe-option small{font-size:10px;color:#9fdcc4}
+.v109-foe-option.active{background:#294736;border-color:#cfe3a7;box-shadow:inset 0 0 0 1px #a4d8a6}
+.v108-hand-item .v109-live-figure{font-size:inherit}
+@media(max-width:600px){body.oncombat .hand-area .v109-damage{padding:2px 3px;font-size:10px;gap:1px;border-radius:5px}body.oncombat .hand-area .v109-damage em{font-size:9px}body.oncombat .hand-area .v109-damage small{font-size:7px}.v109-totals{gap:4px}.v109-foe-option{min-width:95px}}
+
+@media(max-width:600px){
+ .v108-inspect-modal{padding:15px!important}
+ .v108-inspect-layout{display:flex!important;flex-direction:column;align-items:stretch;gap:7px!important}
+ .v108-inspect-art{justify-content:center}
+ .v108-inspect-art .card{width:118px!important;height:167px!important;flex-basis:118px!important}
+ .v108-inspect-info{min-width:0;width:100%}
+ .v108-inspect-info h2{font-size:20px!important;text-align:center}
+ .v108-card-text{text-align:center;font-size:12px!important;margin:4px 0 6px}
+ .v109-breakdown{width:100%;margin:5px 0;padding:9px}
+ .v109-targets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ .v109-foe-option{max-width:none;min-width:0;padding:6px}
+ .v109-big-number{font-size:24px;margin:3px 0}
+ .v109-foe-option span{font-size:10px}
+ .v108-inspect-actions{justify-content:center;margin-top:9px}
+}
 </style></head><body><div class="backdrop"></div><div class="sparkfield"></div><div id="app"></div><div id="fx"></div>
 <script>
 'use strict';
-const VERSION='V1.06'; const SAVE_KEY='ember_descent_sts2_100';
+const VERSION='V1.09'; const SAVE_KEY='ember_descent_sts2_100';
 let S=null, modal=null, sound=false, busy=false; let uid=0; let pendingFx=[];
 const CARDS={
  strike:{name:'Strike',type:'Attack',cost:1,rarity:'Basic',desc:'Deal 6 damage.',icon:'sword',dmg:6},
@@ -242,7 +360,10 @@ function getCost(c){return updatedCost(c)}
 function cardHTML(c,mode='hand'){
  let d=spec(c), cost=updatedCost(c), playable=mode!=='hand'||(S&&S.screen==='battle'&&!busy&&!d.unplayable&&(cost===-1||S.energy>=cost));
  let action=mode==='hand'?'play':mode==='reward'?'rewardcard':'inspectcard';
- return `<button class="card type-${d.type.toLowerCase()} ${!playable?'disabled':''} ${mode!=='hand'?'mini':''}" ${!playable?'disabled':''} data-${action}="${escapeHTML(c.uid)}" aria-label="${escapeHTML(d.name+(c.up?' upgraded':'')+', '+d.desc)}"><span class="cost">${d.unplayable?'—':cost===-1?'X':cost}</span><div class="card-title">${escapeHTML(d.name)}${c.up?'+':''}</div><div class="art">${iconArt(d.icon)}</div><div class="card-type">${d.type}</div><div class="card-desc">${escapeHTML(d.desc)}</div><div class="rarity">${d.rarity}</div></button>`;
+ const live=(mode==='hand'||mode==='combat-inspect')&&S?.screen==='battle'&&d.type==='Attack'?damagePreview(c,targetEnemy()):null;
+ const liveLabel=live?` · ${live.perHit} damage${live.hits>1?' × '+live.hits:''} vs ${live.enemyName}`:'';
+ const badge=live?`<div class="v109-damage" role="note" aria-label="${escapeHTML(live.accessible)}" title="${escapeHTML(live.accessible)}"><b>⚔ ${live.perHit}</b>${live.hits>1?`<em>×${live.hits}</em>`:''}<small>${live.random?'RANDOM':live.hpLoss!==live.total?`${live.hpLoss} HP`:'LIVE'}</small></div>`:'';
+ return `<button class="card type-${d.type.toLowerCase()} ${!playable?'disabled':''} ${mode!=='hand'?'mini':''}" ${!playable&&mode!=='hand'?'disabled':''} data-playable="${playable}" data-${action}="${escapeHTML(c.uid)}" aria-label="${escapeHTML(d.name+(c.up?' upgraded':'')+', '+d.desc+liveLabel)}"><span class="cost">${d.unplayable?'—':cost===-1?'X':cost}</span><div class="card-title">${escapeHTML(d.name)}${c.up?'+':''}</div><div class="art">${iconArt(d.icon)}${badge}</div><div class="card-type">${d.type}</div><div class="card-desc">${live?liveCardDescription(d.desc,live):escapeHTML(d.desc)}</div><div class="rarity">${d.rarity}</div></button>`;
 }
 function log(t){S.log.unshift(t); S.log=S.log.slice(0,22)}
 const alive=()=>S.enemies.filter(e=>e.hp>0);
@@ -292,7 +413,7 @@ function routeScreen(){const places={1:'The Emberwood',2:'The Glass Warrens',3:'
  return `<main class="page screenpad"><div class="innerpanel"><div class="small">Act ${S.act} · ${places[S.act]} · ${S.asc9?'Ascension 9+':'Normal'}</div><h1 class="sectiontitle">Choose your path</h1>${progress()}<p class="subhead">Floor ${S.floor+1} of 9 · Select a destination. Each path is a compact remix, not an exact copy of the original game map.</p><div class="choices">${S.routeOptions.map((r,i)=>`<button class="choice" data-room="${r}"><span class="choiceicon">${{normal:'⚔',elite:'♜',rest:'♨',shop:'✦',event:'☾',boss:'☠'}[r]}</span><span class="choicetitle">${{normal:'Battle',elite:'Elite fight',rest:'Rest site',shop:'Merchant',event:'Mysterious chamber',boss:'Guardian encounter'}[r]}</span><span class="choicedesc">${{normal:'Earn gold and a new card.',elite:'Higher threat. Better rewards.',rest:'Heal or permanently upgrade a card.',shop:'Purchase cards or healing.',event:'Take a risk for a reward.',boss:'Survive the act-ending trial.'}[r]}</span></button>`).join('')}</div><div class="note">Relic: <b>Burning Blood</b> · Heal 6 HP after each victory. Enemies display their current intents at the start of each player turn.</div></div></main>`}
 function battleScreen(){
  let playerPills=pill('Strength',S.strength)+pill('Weak',S.weak)+pill('Vulnerable',S.vulnerable)+pill('Frail',S.frail)+pill('Tangled',S.tangled)+(S.shrink?pill('Shrink',1):'');
- return `<main class="page combat"><div class="combat-meta"><div class="room-name">${S.room} <span class="small">· Act ${S.act} · Floor ${S.floor} · Turn ${S.turn}</span></div><div class="hint">Tap a creature to target it · Cards auto-save</div></div><div class="arena"><div class="scene-lights"></div><div class="round-indicator">${S.asc9?'A9+':'NORMAL'} · ${S.room==='Elite'?'ELITE':S.room==='Boss'?'BOSS':'ENCOUNTER'}</div><div class="fighter-zone"><div class="hero-fighter combatant" data-character="hero"><div class="avatar">${sprite('hero')}</div><div class="foe-title">IRONCLAD</div>${healthbar(S.hp,S.maxHP)}<div class="statuslist">${playerPills||'<span class="statuspill">Burning Blood</span>'}</div></div><div class="enemy-group">${S.enemies.filter(e=>e.hp>0).map(e=>`<div class="enemy-wrap combatant ${targetEnemy()?.id===e.id?'selected':''}" data-enemy="${e.id}" role="button" tabindex="0" aria-label="Target ${e.name}"><div class="intent">${intentHTML(e)}</div><div class="avatar foe-sprite">${sprite(e.art)}</div><div class="foe-title">${escapeHTML(e.name)}</div>${healthbar(e.hp,e.maxHP)}<div class="statuslist">${pill('Str',e.strength)}${pill('Block',e.block)}${pill('Weak',e.weak)}${pill('Vuln',e.vulnerable)}${pill('Ritual',e.ritual)}${e.stunned?pill('Stunned',1):''}</div></div>`).join('')}</div></div></div><div class="hud"><div class="player-summary"><div class="numbers"><span>♥ ${S.hp}</span><span>⬡ ${S.block}</span><span class="symbol">✦ ${S.gold}</span></div><div class="mutedline">Draw ${S.draw.length} · Discard ${S.discard.length} · Exhaust ${S.exhaust.length} · ${S.hand.length} in hand</div></div><div class="battle-log" aria-live="polite">${S.log.slice(0,4).map(l=>`<div>${escapeHTML(l)}</div>`).join('')}</div><div class="actions"><div class="energy" title="Energy">${S.energy}</div><button class="btn dark" data-action="piles" title="View draw/discard/exhaust piles">Piles</button><button class="btn red" data-action="end" ${busy?'disabled':''}>End turn →</button></div></div><div class="hand-wrap">${S.hand.length?S.hand.map(c=>cardHTML(c)).join(''):'<span class="subhead">No cards in your hand — end your turn.</span>'}</div></main>`;
+ return `<main class="page combat"><div class="combat-meta"><div class="room-name">${S.room} <span class="small">· Act ${S.act} · Floor ${S.floor} · Turn ${S.turn}</span></div><div class="hint">Tap a creature to target it · Cards auto-save</div></div><div class="arena"><div class="scene-lights"></div><div class="round-indicator">${S.asc9?'A9+':'NORMAL'} · ${S.room==='Elite'?'ELITE':S.room==='Boss'?'BOSS':'ENCOUNTER'}</div><div class="fighter-zone"><div class="hero-fighter combatant" data-character="hero"><div class="avatar">${sprite('hero')}</div><div class="foe-title">IRONCLAD</div>${healthbar(S.hp,S.maxHP)}<div class="statuslist">${playerPills||'<span class="statuspill">Burning Blood</span>'}</div></div><div class="enemy-group">${S.enemies.filter(e=>e.hp>0).map(e=>`<div class="enemy-wrap combatant ${targetEnemy()?.id===e.id?'selected':''}" data-enemy="${e.id}" role="button" tabindex="0" aria-label="Target ${e.name}"><div class="intent">${intentHTML(e)}</div><div class="avatar foe-sprite">${sprite(e.art)}</div><div class="foe-title">${escapeHTML(e.name)}</div>${healthbar(e.hp,e.maxHP)}<div class="statuslist">${pill('Str',e.strength)}${pill('Block',e.block)}${pill('Weak',e.weak)}${pill('Vuln',e.vulnerable)}${pill('Ritual',e.ritual)}${e.stunned?pill('Stunned',1):''}</div></div>`).join('')}</div></div></div><div class="hud"><div class="player-summary"><div class="numbers"><span>♥ ${S.hp}</span><span title="Current Block">⛨ ${S.block}</span><span class="symbol">✦ ${S.gold}</span></div><div class="mutedline">Draw ${S.draw.length} · Discard ${S.discard.length} · Exhaust ${S.exhaust.length} · ${S.hand.length} in hand</div></div><div class="battle-log" aria-live="polite">${S.log.slice(0,4).map(l=>`<div>${escapeHTML(l)}</div>`).join('')}</div><div class="actions"><div class="energy" title="Energy">${S.energy}</div><button class="btn dark" data-action="piles" title="View draw/discard/exhaust piles">Piles</button><button class="btn red" data-action="end" ${busy?'disabled':''}>End turn →</button></div></div><div class="hand-wrap">${S.hand.length?S.hand.map(c=>cardHTML(c)).join(''):'<span class="subhead">No cards in your hand — end your turn.</span>'}</div></main>`;
 }
 function rewardScreen(){return `<main class="page screenpad"><section class="innerpanel"><div class="small">Battle complete · Burning Blood restored 6 HP</div><h1 class="sectiontitle">Victory</h1><p class="subhead">You defeated ${S.defeated||'your foes'} and gained <b>${S.rewardGold||0} gold</b>. Pick one Ironclad card, or skip.</p><div class="reward-cards">${S.offered.map(c=>cardHTML(c,'reward')).join('')}</div><div class="btnrow"><button class="btn ghost" data-action="skipreward">Skip card →</button></div></section></main>`}
 function restScreen(){const options=S.deck.filter(c=>!c.up&&UP[c.key]);return `<main class="page screenpad"><section class="innerpanel"><div class="small">Rest site · Act ${S.act} · Floor ${S.floor}</div><h1 class="sectiontitle">A quiet flame</h1><p class="subhead">The fire burns low. Recover or sharpen a card permanently.</p><div class="choices"><button class="choice" data-action="restheal"><span class="choiceicon">♨</span><span class="choicetitle">Rest</span><span class="choicedesc">Recover ${Math.ceil(S.maxHP*.3)} HP (up to your max).</span></button><button class="choice" data-action="restupgrade"><span class="choiceicon">⚒</span><span class="choicetitle">Smith</span><span class="choicedesc">Upgrade one card in your permanent deck (${options.length} eligible).</span></button></div></section></main>`}
@@ -490,9 +611,17 @@ function introScreen(){return `<main class="page opening"><section><div class="r
 function banner(){return `<header class="mast"><div class="logo"><svg class="crest" viewBox="0 0 38 44"><path d="M19 1L35 10L32 31L19 42L6 31L3 10Z" fill="#633827" stroke="#e5bb78" stroke-width="2"/><path d="M21 5L15 22H23L15 38L28 18H20Z" fill="#ffd88c"/></svg>Ember Descent</div><div class="topstats">${S?`<span class="stat"><span class="symbol">♥</span><b>${S.hp}/${S.maxHP}</b></span><span class="stat"><span class="symbol">✦</span>${S.gold}</span><span class="stat">⌖ Act ${S.act} · F${S.floor}/${MAP_ACT[S.act].height+2}</span><button class="litebtn" data-action="map">⌖ Map</button><button class="litebtn" data-action="deck">Deck ${S.deck.length}</button><button class="litebtn" data-action="menu">☰</button>`:'<span class="small">IRONCLAD · SINGLE PLAYER</span>'}</div></header>`}
 function statusChip(k,v){if(!v||v<=0)return '';let labels={Strength:['⚔','Strength','Positive: adds damage to every hit'],Weak:['↓','Weak','Attacks deal 25% less damage'],Vulnerable:['✹','Vulnerable','Incoming attack damage increased by 50%'],Frail:['⬡','Frail','Block gained from cards reduced by 25%'],Tangled:['◈','Tangled','Attack energy costs increased'],Shrink:['◇','Shrink','Attack damage reduced'],Ritual:['☽','Ritual','Gains Strength at the end of each round'],Plating:['▣','Plating','Gain Block at the end of each turn'],Dexterity:['⬡','Dexterity','Extra Block from cards'],Colossus:['◒','Colossus','Take half damage from Vulnerable attackers'],Flame:['♨','Flame Barrier','Deal damage back to attackers'],Rage:['✦','Rage','Gain Block when attacking'],Stunned:['⏳','Stunned','Loses next action'],Block:['⬡','Block','Damage absorption']};let [ico,name,tip]=labels[k]||['✧',k,k];return `<span class="combat-status ${['Weak','Vulnerable','Frail','Tangled','Shrink'].includes(k)?'debuff':'buff'}" title="${escapeHTML(tip)}" aria-label="${name} ${v}"><span class="status-icon">${ico}</span><b>${v}</b><span class="status-name">${name}</span></span>`}
 function pill(k,num){return statusChip(k==='Str'?'Strength':k==='Vuln'?'Vulnerable':k,num)}
+// V1.07 — prominent shield-shaped Block values beside combatant HP bars.
+function blockShield(amount,label){
+ const n=Math.max(0,Math.floor(Number(amount)||0));
+ return `<span class="block-shield ${n?'block-present':'block-empty'}" role="img" aria-label="${escapeHTML(label)} has ${n} Block" title="${escapeHTML(label)}: ${n} Block"><svg viewBox="0 0 48 54" aria-hidden="true" focusable="false"><path d="M24 2 L43 10 L41 29 Q39 42 24 52 Q9 42 7 29 L5 10 Z" fill="#101c2d" stroke="#d8edff" stroke-width="2.2"/><path d="M24 6 L38 13 L36.5 29 Q35 38 24 46 Q13 38 11.5 29 L10 13 Z" fill="#457ba1" stroke="#9ed7ff" stroke-width="1.4"/><path d="M24 9 L34 15 L33 27 Q32 34 24 41 L24 9Z" fill="#a8ddfb" opacity=".24"/><path d="M12 17 L36 17" stroke="#e0f5ff" opacity=".4" stroke-width="1.1"/></svg><b class="block-shield-value">${n}</b></span>`;
+}
+function combatVitals(hp,max,block,label){
+ return `<div class="combat-vitals">${healthbar(hp,max)}${blockShield(block,label)}</div>`;
+}
 function statusForPlayer(){let result=statusChip('Strength',S.strength)+statusChip('Dexterity',S.dexterity)+statusChip('Plating',S.plating)+statusChip('Weak',S.weak)+statusChip('Vulnerable',S.vulnerable)+statusChip('Frail',S.frail)+statusChip('Tangled',S.tangled)+(S.shrink?statusChip('Shrink',1):'')+statusChip('Flame',S.flame)+statusChip('Rage',S.rage)+statusChip('Colossus',S.colossus);for(let [key,n] of Object.entries(S.powers||{}))result+=statusChip(CARDS[key]?.name||key,n);return result||'<span class="status-none">No active effects</span>'}
-function statusForEnemy(e){return statusChip('Strength',e.strength)+statusChip('Block',e.block)+statusChip('Weak',e.weak)+statusChip('Vulnerable',e.vulnerable)+statusChip('Ritual',e.ritual)+(e.stunned?statusChip('Stunned',1):'')||'<span class="status-none">No effects</span>'}
-function battleScreen(){return `<main class="page combat"><div class="combat-meta"><div class="room-name">${S.room} <span class="small">· Act ${S.act} · Floor ${S.floor} · Turn ${S.turn}</span></div><div class="hint">Choose a target, play a card, then end the turn</div></div><div class="arena"><div class="scene-lights"></div><div class="round-indicator">${S.asc9?'A9+':'NORMAL'} · ${S.room==='Elite'?'ELITE':S.room==='Boss'?'BOSS':'ENCOUNTER'}</div><div class="fighter-zone"><div class="hero-fighter combatant" data-character="hero"><div class="avatar">${sprite('hero')}</div><div class="foe-title">IRONCLAD</div>${healthbar(S.hp,S.maxHP)}<div class="combat-statuses">${statusForPlayer()}</div></div><div class="enemy-group">${alive().map(e=>`<div class="enemy-wrap combatant ${targetEnemy()?.id===e.id?'selected':''}" data-enemy="${e.id}" role="button" tabindex="0" aria-label="Target ${escapeHTML(e.name)}"><div class="intent">${intentHTML(e)}</div><div class="avatar foe-sprite">${sprite(e.art)}</div><div class="foe-title">${escapeHTML(e.name)}</div>${healthbar(e.hp,e.maxHP)}<div class="combat-statuses">${statusForEnemy(e)}</div></div>`).join('')}</div></div></div><div class="combat-toolbar"><div class="player-summary"><div class="numbers"><span>♥ ${S.hp}</span><span>⬡ ${S.block}</span><span>✦ ${S.gold}</span></div><div class="mutedline">${S.hand.length} cards in hand · ${S.deck.length} in deck</div></div><div class="piles-bar"><button class="pile-button" data-pile="draw"><b>⤵ ${S.draw.length}</b><small>Draw</small></button><button class="pile-button" data-pile="discard"><b>↷ ${S.discard.length}</b><small>Discard</small></button><button class="pile-button" data-pile="exhaust"><b>♨ ${S.exhaust.length}</b><small>Exhaust</small></button></div><div class="actions"><div class="energy" title="Energy">${S.energy}</div><button class="btn red" data-action="end" ${busy?'disabled':''}>End turn →</button></div></div><div class="battle-log compact-log" aria-live="polite">${S.log.slice(0,2).map(l=>`<div>${escapeHTML(l)}</div>`).join('')}</div><div class="hand-wrap">${S.hand.length?S.hand.map(c=>cardHTML(c)).join(''):'<span class="subhead">Your hand is empty — end the turn.</span>'}</div></main>`}
+function statusForEnemy(e){return statusChip('Strength',e.strength)+statusChip('Weak',e.weak)+statusChip('Vulnerable',e.vulnerable)+statusChip('Ritual',e.ritual)+(e.stunned?statusChip('Stunned',1):'')||'<span class="status-none">No effects</span>'}
+function battleScreen(){return `<main class="page combat"><div class="combat-meta"><div class="room-name">${S.room} <span class="small">· Act ${S.act} · Floor ${S.floor} · Turn ${S.turn}</span></div><div class="hint">Choose a target, play a card, then end the turn</div></div><div class="arena"><div class="scene-lights"></div><div class="round-indicator">${S.asc9?'A9+':'NORMAL'} · ${S.room==='Elite'?'ELITE':S.room==='Boss'?'BOSS':'ENCOUNTER'}</div><div class="fighter-zone"><div class="hero-fighter combatant" data-character="hero"><div class="avatar">${sprite('hero')}</div><div class="foe-title">IRONCLAD</div>${combatVitals(S.hp,S.maxHP,S.block,'Ironclad')}<div class="combat-statuses">${statusForPlayer()}</div></div><div class="enemy-group">${alive().map(e=>`<div class="enemy-wrap combatant ${targetEnemy()?.id===e.id?'selected':''}" data-enemy="${e.id}" role="button" tabindex="0" aria-label="Target ${escapeHTML(e.name)}"><div class="intent">${intentHTML(e)}</div><div class="avatar foe-sprite">${sprite(e.art)}</div><div class="foe-title">${escapeHTML(e.name)}</div>${combatVitals(e.hp,e.maxHP,e.block,e.name)}<div class="combat-statuses">${statusForEnemy(e)}</div></div>`).join('')}</div></div></div><div class="combat-toolbar"><div class="player-summary"><div class="numbers"><span>♥ ${S.hp}</span><span>⬡ ${S.block}</span><span>✦ ${S.gold}</span></div><div class="mutedline">${S.hand.length} cards in hand · ${S.deck.length} in deck</div></div><div class="piles-bar"><button class="pile-button" data-pile="draw"><b>⤵ ${S.draw.length}</b><small>Draw</small></button><button class="pile-button" data-pile="discard"><b>↷ ${S.discard.length}</b><small>Discard</small></button><button class="pile-button" data-pile="exhaust"><b>♨ ${S.exhaust.length}</b><small>Exhaust</small></button></div><div class="actions"><div class="energy" title="Energy">${S.energy}</div><button class="btn red" data-action="end" ${busy?'disabled':''}>End turn →</button></div></div><div class="battle-log compact-log" aria-live="polite">${S.log.slice(0,2).map(l=>`<div>${escapeHTML(l)}</div>`).join('')}</div><div class="hand-wrap">${S.hand.length?S.hand.map(c=>cardHTML(c)).join(''):'<span class="subhead">Your hand is empty — end the turn.</span>'}</div></main>`}
 function rewardScreen(){return `<main class="page screenpad"><section class="innerpanel"><div class="small">Battle complete · Burning Blood restored 6 HP</div><h1 class="sectiontitle">Victory</h1><p class="subhead">You defeated ${escapeHTML(S.defeated||'your foes')} and gained <b>${S.rewardGold||0} gold</b>. Select one card from the single-player Ironclad pool, or skip.</p><div class="reward-cards">${S.offered.map(c=>cardHTML(c,'reward')).join('')}</div><button class="btn ghost" data-action="skipreward">Skip reward →</button></section></main>`}
 function treasureScreen(){return `<main class="page screenpad"><section class="innerpanel"><div class="small">Treasure chamber · Act ${S.act}</div><h1 class="sectiontitle">Ancient cache</h1><p class="subhead">You discovered 75 gold in a forgotten chest. (Relics are not yet included in this prototype.)</p><button class="btn" data-action="leave">Continue →</button></section></main>`}
 function render(){let root=$('#app');if(!root)return;let screens={intro:introScreen,route:routeScreen,battle:battleScreen,reward:rewardScreen,rest:restScreen,shop:shopScreen,event:eventScreen,treasure:treasureScreen,victory:()=>endScreen(true),death:()=>endScreen(false)};root.innerHTML=`<div class="backdrop"></div><div class="sparkfield"></div>${S?banner():'<header class="mast"><div class="logo">✦ EMBER DESCENT</div><span class="small">Ironclad · Single player</span></header>'}${(screens[S?.screen||'intro']||introScreen)()}<footer class="footer">${VERSION} · Offline GitHub Pages · Original enemy illustrations · Unofficial fan prototype</footer>${modalHTML()}`;document.body.classList.toggle('oncombat',S?.screen==='battle');if(S?.screen==='route'){requestAnimationFrame(()=>{let el=document.querySelector('#mapScroll');if(el)el.scrollTop=el.scrollHeight})}}
@@ -685,24 +814,35 @@ function cleanDrag(){if(dragGhost){dragGhost.remove();dragGhost=null}if(dragLine
 function fitHand(){if(S?.screen!=='battle')return;let wrap=document.querySelector('.hand-wrap');if(!wrap)return;let cards=[...wrap.querySelectorAll('.card')],count=cards.length;
  if(!count)return;let narrow=window.matchMedia('(max-width:600px)').matches;if(!narrow){cards.forEach(el=>el.style.marginLeft='');return}
  let width=window.innerWidth,short=window.innerHeight<=720,cardWidth=short?86:100,usable=width-14;
- let gap=4;let neg=count<=1?0:Math.min(0,(usable-cardWidth*count)/(count-1)-gap);cards.forEach((el,i)=>{el.style.marginLeft=i?neg+'px':'0px';el.style.zIndex=String(i+1)})
+ cards.forEach((el,i)=>{el.style.marginLeft='0px';el.style.zIndex='1'})
 }
 const oldRender=render;
 render=function(){oldRender();if(!S||S.screen!=='battle'){chosenTargetCard=null;cleanDrag();document.body.classList.remove('choosing-target');document.getElementById('targeting-banner')?.remove()}
  if(S?.screen==='battle'){requestAnimationFrame(()=>{fitHand();if(chosenTargetCard&&!S.hand.find(c=>c.uid===chosenTargetCard))setTargetMode(null);else if(chosenTargetCard)setTargetMode(chosenTargetCard)})}}
 function makeDragGhost(source,clientX,clientY){dragGhost=source.cloneNode(true);dragGhost.classList.add('drag-card-ghost');dragGhost.removeAttribute('data-play');dragGhost.style.width=source.getBoundingClientRect().width+'px';dragGhost.style.height=source.getBoundingClientRect().height+'px';document.body.appendChild(dragGhost);
- dragLine=document.createElementNS('http://www.w3.org/2000/svg','svg');dragLine.setAttribute('class','drag-aim-line');dragLine.innerHTML='<defs><marker id="aimhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#ffd082"/></marker></defs><path id="aimpath" stroke="#ffd082" stroke-width="4" stroke-linecap="round" fill="none" stroke-dasharray="9 5" marker-end="url(#aimhead)"/>';document.body.appendChild(dragLine);positionDrag(clientX,clientY)}
+ if(isTargetedCard(S.hand.find(c=>c.uid===cardPointer?.id))){dragLine=document.createElementNS('http://www.w3.org/2000/svg','svg');dragLine.setAttribute('class','drag-aim-line');dragLine.innerHTML='<defs><marker id="aimhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#ffd082"/></marker></defs><path id="aimpath" stroke="#ffd082" stroke-width="4" stroke-linecap="round" fill="none" stroke-dasharray="9 5" marker-end="url(#aimhead)"/>';document.body.appendChild(dragLine)}positionDrag(clientX,clientY)}
 function positionDrag(x,y){if(!dragGhost)return;dragGhost.style.left=x+'px';dragGhost.style.top=y+'px';const p=dragLine?.querySelector('#aimpath');if(p){let box=cardPointer?.source?.getBoundingClientRect();let cx=(box?.left||x)+(box?.width||0)/2,cy=(box?.top||y)+(box?.height||0)/2;p.setAttribute('d',`M ${cx} ${cy} Q ${(cx+x)/2} ${Math.min(cy,y)-60} ${x} ${y}`)}
  document.querySelectorAll('.drop-ready').forEach(x=>x.classList.remove('drop-ready'));let target=document.elementFromPoint(x,y)?.closest('[data-enemy]');if(target)target.classList.add('drop-ready')}
-document.addEventListener('pointerdown',e=>{if(S?.screen!=='battle'||busy||modal)return;let source=e.target.closest('[data-play]');if(!source||e.button!==0)return;let id=source.dataset.play,c=S.hand.find(x=>x.uid===id);if(!isTargetedCard(c)||source.disabled)return;cardPointer={id,source,x:e.clientX,y:e.clientY,pid:e.pointerId,dragging:false}},true);
-document.addEventListener('pointermove',e=>{if(!cardPointer||e.pointerId!==cardPointer.pid)return;let dx=e.clientX-cardPointer.x,dy=e.clientY-cardPointer.y;if(!cardPointer.dragging&&Math.hypot(dx,dy)>9){cardPointer.dragging=true;setTargetMode(cardPointer.id);makeDragGhost(cardPointer.source,e.clientX,e.clientY)}if(cardPointer.dragging){e.preventDefault();positionDrag(e.clientX,e.clientY)}},{capture:true,passive:false});
-document.addEventListener('pointerup',e=>{if(!cardPointer||cardPointer.pid!==e.pointerId)return;const info=cardPointer,dragged=info.dragging;let target=dragged?document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-enemy]'):null;cleanDrag();if(dragged){lastDragClickBlock=Date.now()+350;if(target)commitTargetCard(info.id,Number(target.dataset.enemy));else setTargetMode(info.id)}},true);
+document.addEventListener('pointerdown',e=>{if(S?.screen!=='battle'||busy||modal)return;let source=e.target.closest('[data-play]');if(!source||e.button!==0)return;let id=source.dataset.play,c=S.hand.find(x=>x.uid===id);if(!c||spec(c).unplayable||(updatedCost(c)!==-1&&updatedCost(c)>S.energy))return;cardPointer={id,source,x:e.clientX,y:e.clientY,pid:e.pointerId,dragging:false}},true);
+document.addEventListener('pointermove',e=>{if(!cardPointer||e.pointerId!==cardPointer.pid)return;let dx=e.clientX-cardPointer.x,dy=e.clientY-cardPointer.y;if(!cardPointer.dragging&&Math.abs(dx)>11&&Math.abs(dx)>Math.abs(dy)*1.45&&e.pointerType==='touch'){cardPointer=null;return}
+ if(!cardPointer.dragging&&Math.hypot(dx,dy)>11){cardPointer.dragging=true;if(isTargetedCard(S.hand.find(c=>c.uid===cardPointer.id)))setTargetMode(cardPointer.id);else setTargetMode(null);makeDragGhost(cardPointer.source,e.clientX,e.clientY)}
+ if(cardPointer?.dragging){e.preventDefault();positionDrag(e.clientX,e.clientY)}},{capture:true,passive:false});
+document.addEventListener('pointerup',e=>{if(!cardPointer||cardPointer.pid!==e.pointerId)return;const info=cardPointer,dragged=info.dragging;let target=dragged?document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-enemy]'):null;cleanDrag();if(dragged){lastDragClickBlock=Date.now()+450;
+ let c=S.hand.find(x=>x.uid===info.id),aimed=isTargetedCard(c),hit=document.elementFromPoint(e.clientX,e.clientY);
+ if(aimed){if(target)commitTargetCard(info.id,Number(target.dataset.enemy));else setTargetMode(null)}
+ else if(c&&hit?.closest('.arena,.fighter-zone,.combat-meta,.combat-toolbar')){setTargetMode(null);playCard(info.id)}
+ else setTargetMode(null);
+ }},true);
 document.addEventListener('pointercancel',()=>{cleanDrag()},true);
 // Run before legacy delegated click-to-play. Targeted attacks tap-to-select; drags play on drop.
 document.addEventListener('click',e=>{
  if(e.target.closest('[data-cancel-target]')){e.preventDefault();e.stopImmediatePropagation();setTargetMode(null);return}
- let cardEl=e.target.closest('[data-play]');if(cardEl&&S?.screen==='battle'&&!modal){let c=S.hand.find(c=>c.uid===cardEl.dataset.play);if(isTargetedCard(c)){
- e.preventDefault();e.stopImmediatePropagation();if(Date.now()>lastDragClickBlock)setTargetMode(chosenTargetCard===c.uid?null:c.uid);return}}
+ let cardEl=e.target.closest('[data-play]');if(cardEl&&S?.screen==='battle'&&!modal){
+ e.preventDefault();e.stopImmediatePropagation();
+ let c=S.hand.find(c=>c.uid===cardEl.dataset.play);
+ if(c&&Date.now()>lastDragClickBlock){modal={type:'cardinspect',id:c.uid,from:'battle'};render()}
+ return;
+}
  let enemy=e.target.closest('[data-enemy]');if(enemy&&chosenTargetCard&&S?.screen==='battle'){e.preventDefault();e.stopImmediatePropagation();commitTargetCard(chosenTargetCard,Number(enemy.dataset.enemy))}
 },true);
 document.addEventListener('click',e=>{let t=e.target.closest('[data-catalog-entry]');if(t)return},true);
@@ -1047,10 +1187,10 @@ endTurn=async function(){
 };
 // Avoid double-rounding when Weak and Vulnerable both affect one hit.
 // Strength is added before both multipliers, and floor happens once per hit.
-dmgCard=function(e,base){
+dmgCard=function(e,base,strengthOverride=S.strength){
  let multiplier=(S.weak>0?.75:1)*(S.shrink?.7:1)*(e.vulnerable>0?(S.powers?.cruelty?(S.crueltyBonus||1.75):1.5):1);
  if(e.key==='sentinel')multiplier*=1+(e.slow||0)*.1;
- return Math.max(0,Math.floor(Math.max(0,base+(S.strength||0))*multiplier));
+ return Math.max(0,Math.floor(Math.max(0,base+(strengthOverride||0))*multiplier));
 };
 adjustedEnemyDamage=function(e,m){
  if(m.kind!=='attack')return 0;
@@ -1202,5 +1342,170 @@ render=function(){
  if(vfxTransitionHeld)return;
  vfxOriginalRender();
 };
+
+
+/* V1.08 — swipeable hand, expanded card inspection, universal drag casting. */
+let v108HandScroll=0;
+const v108BattleScreen=battleScreen;
+battleScreen=function(){
+ const content=v108BattleScreen();
+ const handToolbar=`<div class="hand-tools" role="group" aria-label="Hand navigation"><span class="hand-count">HAND <b>${S.hand.length}/10</b></span><button type="button" class="hand-nav" data-hand-scroll="-1" aria-label="Scroll hand left">‹</button><button type="button" class="hand-nav" data-hand-scroll="1" aria-label="Scroll hand right">›</button><button class="hand-view" data-action="handall">View all cards</button><span class="hand-hint">Swipe cards · Tap for live damage · Drag to play</span></div>`;
+ return content.replace('<div class="hand-wrap">','<section class="hand-area">'+handToolbar+'<div class="hand-wrap" role="group" aria-label="Swipeable card hand">').replace('</div></main>','</div></section></main>');
+};
+const v108Render=render;
+render=function(){
+ if(S?.screen==='battle')v108HandScroll=document.querySelector('.hand-wrap')?.scrollLeft??v108HandScroll;
+ v108Render();
+ if(S?.screen==='battle')requestAnimationFrame(()=>{
+   const row=document.querySelector('.hand-wrap');
+   if(row){row.scrollLeft=Math.min(v108HandScroll,Math.max(0,row.scrollWidth-row.clientWidth));}
+   document.querySelectorAll('.hand-wrap .card').forEach(c=>{c.style.marginLeft='0px';c.style.zIndex='1'});
+ });
+};
+const v108ModalHTML=modalHTML;
+modalHTML=function(){
+ if(modal?.type==='handall'){
+   return `<div class="overlay"><section class="modal v108-hand-modal" role="dialog" aria-modal="true" aria-label="All cards in hand"><button class="litebtn close" data-action="close" aria-label="Close">✕</button><h2>Cards in your hand (${S.hand.length}/10)</h2><p class="note">Choose any card to read its complete text and play it. Scroll inside this window to see all cards.</p><div class="v108-hand-list">${S.hand.map(c=>{let d=spec(c),cost=updatedCost(c);return `<button class="v108-hand-item" data-inspect-hand="${escapeHTML(c.uid)}"><span class="v108-hand-cost">${cost===-1?'X':cost}</span><span><b>${escapeHTML(d.name)}${c.up?'+':''}</b><small>${escapeHTML(d.type)} · ${escapeHTML(d.rarity)}</small><span class="v108-hand-desc">${S.screen==='battle'&&d.type==='Attack'?liveCardDescription(d.desc,damagePreview(c,targetEnemy())):escapeHTML(d.desc)}</span></span><span class="v108-hand-eye">⌕</span></button>`}).join('')||'<p class="note">Your hand is empty.</p>'}</div><button class="btn ghost" data-action="close">Return to battle</button></section></div>`;
+ }
+ if(modal?.type==='cardinspect'){
+   let c=S?.hand?.find(x=>x.uid===modal.id);
+   if(!c)return `<div class="overlay"><section class="modal"><h2>Card no longer in hand</h2><button class="btn" data-action="close">Close</button></section></div>`;
+   let d=spec(c), cost=updatedCost(c), valid=!d.unplayable&&(cost===-1||cost<=S.energy),targeted=isTargetedCard(c);
+   let cleanCard=cardHTML(c,'combat-inspect').replace(/\sdata-rewardcard="[^"]*"/g,'').replace(/<button /,'<div ').replace(/<\/button>/,'</div>');
+   return `<div class="overlay"><section class="modal v108-inspect-modal" role="dialog" aria-modal="true" aria-label="${escapeHTML(d.name)} details"><button class="litebtn close" data-action="inspectclose" aria-label="Close">✕</button><p class="small">CARD DETAILS · ${escapeHTML(d.type.toUpperCase())}</p><div class="v108-inspect-layout"><div class="v108-inspect-art">${cleanCard}</div><div class="v108-inspect-info"><h2>${escapeHTML(d.name)}${c.up?'+':''}</h2><p class="v108-card-text">${escapeHTML(d.desc)}</p>${d.type==='Attack'?damageBreakdownHTML(c):''}<p class="note">${cost===-1?'X':cost} Energy · ${escapeHTML(d.rarity)}${c.up?' · Upgraded':''}</p><p class="note">${targeted?'Select a foe below to update the live damage, then tap Select enemy or drag the card.':'Drag this card onto the battlefield to activate it.'}</p><div class="v108-inspect-actions"><button class="btn primary" data-action="${targeted?'inspectaim':'inspectplay'}" ${valid?'':'disabled'}>${targeted?'Select enemy →':d.type==='Power'?'Activate Power ✦':'Play card ⬡'}</button><button class="btn ghost" data-action="inspectclose">Back</button></div>${valid?'':`<p class="note">${d.unplayable?'This card cannot be played directly.':'Not enough Energy to play this card.'}</p>`}</div></div></section></div>`;
+ }
+ return v108ModalHTML();
+};
+const v108Act=act;
+act=function(action){
+ if(action==='handall'){modal={type:'handall'};render();return}
+ if(action==='inspectclose'){modal=modal?.from==='handall'?{type:'handall'}:null;render();return}
+ if(action==='inspectplay'||action==='inspectaim'){
+   let c=S?.hand?.find(x=>x.uid===modal?.id);
+   if(!c){modal=null;render();return}
+   let d=spec(c), cost=updatedCost(c);
+   if(d.unplayable||(cost!==-1&&cost>S.energy))return;
+   modal=null;render();
+   if(action==='inspectplay'&&!isTargetedCard(c))playCard(c.uid);
+   else setTargetMode(c.uid);
+   return;
+ }
+ v108Act(action);
+};
+document.addEventListener('click',e=>{
+ let nav=e.target.closest('[data-hand-scroll]');
+ if(nav){e.preventDefault();const row=document.querySelector('.hand-wrap');if(!row)return;
+   const width=row.querySelector('.card')?.getBoundingClientRect().width||100;
+   row.scrollBy({left:Number(nav.dataset.handScroll)*(width*2+14),behavior:'smooth'});
+   return;
+ }
+ let item=e.target.closest('[data-inspect-hand]');
+ if(item){e.preventDefault();let uid=item.dataset.inspectHand;
+   if(S?.hand?.some(c=>c.uid===uid)){modal={type:'cardinspect',id:uid,from:'handall'};render()}
+ }
+},true);
+document.addEventListener('scroll',e=>{if(e.target?.matches?.('.hand-wrap'))v108HandScroll=e.target.scrollLeft},true);
+/* V1.09 — single-source, target-aware live card damage display.
+  Damage is projected through the same dmgCard() routine as actual hits.
+  HP totals are shown separately because Block is not a damage modifier.
+  Does not change the battle mechanics or persisted save format. */
+function damagePreview(c,e){
+ if(!S||S.screen!=='battle'||!c||spec(c).type!=='Attack'||!e||e.hp<=0)return null;
+ const d=spec(c),key=c.key;
+ const chosen=targetEnemy(), selectedIsSentinel=chosen?.id===e.id && chosen?.key==='sentinel';
+ let base=(d.dmg||0)+(c.bonus||0),hits=1,random=false,aoe=!!d.aoe;
+ switch(key){
+  case 'body':base=S.block||0;break;
+  case 'perfect':base=6+(c.up?3:2)*[...S.draw,...S.hand,...S.discard,...S.exhaust].filter(x=>CARDS[x.key]?.name.includes('Strike')).length;break;
+  case 'ashen':base=6+(c.up?4:3)*S.exhaust.length;break;
+  case 'bully':base=4+(c.up?3:2)*(e.vulnerable||0);break;
+  case 'pactsend':base=S.exhaust.length>=3?(d.dmg||18):0;aoe=true;break;
+  case 'rampage':base=10+(c.bonus||0);break;
+  case 'spite':hits=(S.turnHpLoss||0)>0?(c.up?3:2):1;break;
+  case 'tear':hits=1+(S.lossCount||0);break;
+  case 'thrash':base=(d.dmg||4)+(c.bonus||0);hits=2;break;
+  case 'fiend':hits=Math.max(0,S.hand.length-1);break;
+  case 'whirlwind':hits=Math.max(0,S.energy||0);aoe=true;break;
+  case 'conflag':hits=c.up?5:4;aoe=true;break;
+  case 'swordboom':hits=c.up?4:3;random=true;break;
+  case 'stomp':case 'breakthrough':case 'howl':case 'thunder':aoe=true;break;
+  case 'dismantle':hits=e.vulnerable>0?2:1;break;
+  case 'twin':case 'fightme':hits=2;break;
+ }
+ // The engine applies Pain and self-inflicted HP loss before the attack.
+ // Rupture thus changes the very attack that activated it.
+ const pain=(S.hand||[]).filter(x=>x.key==='pain'&&x.uid!==c.uid).length;
+ const selfLoss=({hemo:2,bloodwall:2,bloodlet:3,breakthrough:1,brand:1,offering:6})[key]||0;
+ const expectedTriggers=(pain>0?pain:0)+(selfLoss?1:0);
+ if(key==='spite'&&((S.turnHpLoss||0)>0||expectedTriggers>0))hits=c.up?3:2;
+ if(key==='tear')hits=1+(S.lossCount||0)+expectedTriggers;
+ const strength=(S.strength||0)+((S.powers?.rupture||0)*expectedTriggers);
+ // An enemy's slow debuff increments once when a played card is aimed at it,
+ // before damage is computed. Include this extra stack in the preview.
+ const projectedEnemy=selectedIsSentinel?{...e,slow:(e.slow||0)+1}:e;
+ // dmgCard's optional third argument is added in V1.09, default unchanged.
+ const perHit=dmgCard(projectedEnemy,base,strength);
+ const total=perHit*hits;
+ const block=Math.max(0,e.block||0);
+ const postBlock=Math.max(0,total-block);
+ const hpLoss=Math.min(Math.max(0,e.hp||0),postBlock);
+ const repeat=!!(S.oneTwo>0);
+ const conditional=!!(S.powers?.inferno&&(pain+selfLoss)>0)||repeat||random;
+ let accessible=`${d.name}${c.up?'+':''}: ${perHit} damage per hit`;
+ if(hits!==1)accessible+=`, ${hits} hits, ${total} total attack damage`;
+ accessible+=` against ${e.name}, ${hpLoss} HP after ${block} Block and current HP`;
+ if(random)accessible+='; random enemy targets, damage only if this enemy is hit';
+ if(repeat)accessible+='; One-Two Punch causes an extra play, which may change the final total';
+ if(S.powers?.inferno&&(pain+selfLoss)>0)accessible+='; HP-loss Power may affect the target first';
+ return {perHit,hits,total,postBlock,hpLoss,enemyName:e.name,enemyId:e.id,block,base,strength,random,aoe,repeat,conditional,accessible};
+}
+function liveCardDescription(desc,preview){
+ if(!preview)return escapeHTML(desc);
+ const raw=String(desc),piece=`<strong class="v109-live-figure">${preview.perHit}</strong>`;
+ let safe=escapeHTML(raw);
+ // Keep permanent card definitions unchanged; substitute only the first
+ // actual attack number, not Block, Energy, self-damage, or power text.
+ if(/\bDeal \d+ damage/i.test(raw))safe=safe.replace(/\b(Deal\s+)\d+(\s+damage)/i,(_,start,end)=>start+piece+end);
+ else if(/\bDeal damage equal to your Block/i.test(raw))safe=safe.replace(/\bDeal damage equal to your Block/i,`Deal ${piece} damage (from Block)`);
+ if(preview.hits>1 && !/\b(times|twice|hits)/i.test(raw))safe+=` <span class="v109-live-sub">(${preview.hits} hits)</span>`;
+ return safe;
+}
+function damageBreakdownHTML(c){
+ if(!S||S.screen!=='battle'||spec(c).type!=='Attack')return '';
+ const enemies=alive(),selected=targetEnemy();
+ const previews=enemies.map(e=>damagePreview(c,e)).filter(Boolean);
+ const current=previews.find(p=>p.enemyId===selected?.id)||previews[0];
+ if(!current)return '';
+ const targets=previews.map(p=>`<button type="button" class="v109-foe-option ${p.enemyId===selected?.id?'active':''}" data-preview-target="${p.enemyId}" aria-pressed="${p.enemyId===selected?.id}"><span>${escapeHTML(p.enemyName)}</span><b>${p.perHit}${p.hits>1?' × '+p.hits:''}</b><small>${p.hpLoss} HP after Block</small></button>`).join('');
+ const modifiers=[S.strength>0?`+${S.strength} Strength`:S.strength<0?`${S.strength} Strength`:'',S.weak>0?'Weak ×0.75':'',S.shrink?'Shrink ×0.7':'',selected?.vulnerable>0?`Vulnerable ×${S.powers?.cruelty?(S.crueltyBonus||1.75):1.5}`:'',selected?.key==='sentinel'?'Slow on play':''].filter(Boolean);
+ return `<div class="v109-breakdown" aria-live="polite"><div class="v109-breakdown-head">LIVE DAMAGE · ${escapeHTML(current.enemyName)}</div><div class="v109-big-number">⚔ ${current.perHit}${current.hits>1?` <span>× ${current.hits}</span>`:''}</div><div class="v109-totals"><span><b>${current.total}</b> attack damage</span><span><b>${current.block}</b> enemy Block</span><span><b>${current.hpLoss}</b> HP damage</span></div>${modifiers.length?`<p class="v109-modifiers">${escapeHTML(modifiers.join(' · '))}</p>`:''}${previews.length>1?`<p class="small">Tap a foe to compare damage before playing:</p><div class="v109-targets">${targets}</div>`:''}${current.random?'<p class="note">Random hits are not guaranteed to strike the selected enemy.</p>':''}${current.conditional?'<p class="note">Other automatic effects or repeat plays can change the final total.</p>':''}</div>`;
+}
+// Clicking a foe in the inspection modal changes the same selected target
+// used by tap-to-target and dragging, with no damage dealt until card play.
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-preview-target]');
+ if(!b||modal?.type!=='cardinspect'||S?.screen!=='battle')return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const id=Number(b.dataset.previewTarget);
+ const i=S.enemies.findIndex(q=>q.id===id&&q.hp>0);
+ if(i<0)return;
+ S.target=i;save();render();
+},true);
+// When a dragged card hovers a different foe, show damage against THAT foe
+// on the ghost itself, even though selection changes only after a valid drop.
+document.addEventListener('pointermove',e=>{
+ if(!cardPointer?.dragging||!dragGhost||S?.screen!=='battle')return;
+ const id=cardPointer.id,c=S.hand.find(q=>q.uid===id);
+ const hit=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-enemy]');
+ const enemy=hit?S.enemies.find(q=>q.id===Number(hit.dataset.enemy)&&q.hp>0):null;
+ if(!c||!enemy||spec(c).type!=='Attack')return;
+ const p=damagePreview(c,enemy),badge=dragGhost.querySelector('.v109-damage');
+ if(!p||!badge)return;
+ badge.innerHTML=`<b>⚔ ${p.perHit}</b>${p.hits>1?`<em>×${p.hits}</em>`:''}<small>${p.hpLoss!==p.total?`${p.hpLoss} HP`:'LIVE'}</small>`;
+ badge.title=p.accessible;
+},false);
+
+// Refresh one time for new hand toolbar on an already-loaded local save.
+render();
 
 </script></body></html>
