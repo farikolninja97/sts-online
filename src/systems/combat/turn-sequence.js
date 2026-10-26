@@ -30,23 +30,30 @@ endTurn=async function(){
   for(let e of [...alive()]){
    if(S.hp<=0||S.screen!=='battle')break;
    const m=moveFor(e),kind=m.kind;log(`${e.name}: ${m.n}`);
-   render();let source=document.querySelector(`[data-enemy="${e.id}"] .avatar`);
-   if(source){source.classList.remove('striking','casting');void source.offsetWidth;source.classList.add(kind==='attack'?'striking':'casting')}
-   await sleep(240);
+   render();
+   await enemyCinematics.begin(e,m);
    if(kind==='attack'){
     for(let i=0;i<(m.hits||1);i++){
-     if(e.hp<=0)break;
-     const predicted=adjustedEnemyDamage(e,m);
-     const impact=receiveDamage(predicted,{attack:true,source:e});
-     log(`${e.name} attacks for ${predicted} (${impact.blocked} blocked)`);
-     queueFX('hero',impact.actual,'hit',{blocked:impact.blocked,incoming:predicted,style:'enemy'});
-     if(e.key==='stone'&&impact.actual===0&&impact.blocked>0)e.nextStun=true;
-     render();triggerFX();await sleep(165);
-     if(S.hp<=0)break;
+     if(e.hp<=0||S.hp<=0||S.screen!=='battle')break;
+     await enemyCinematics.hit(e,m,i,m.hits||1,()=>{
+      const predicted=adjustedEnemyDamage(e,m);
+      const impact=receiveDamage(predicted,{attack:true,source:e});
+      log(`${e.name} attacks for ${predicted} (${impact.blocked} blocked)`);
+      queueFX('hero',impact.actual,'hit',{blocked:impact.blocked,incoming:predicted,style:enemyCinematics.style(e,m)==='heavy'?'heavy':enemyCinematics.style(e,m)==='magic'?'ember':'enemy'});
+      if(e.key==='stone'&&impact.actual===0&&impact.blocked>0)e.nextStun=true;
+      // Keep the battlefield onscreen for the impact even if Ironclad falls.
+      const defeated=S.screen==='death';
+      if(defeated)S.screen='battle';
+      render();enemyCinematics.mask(e);triggerFX();
+      if(defeated)S.screen='death';
+     });
     }
     if(m.block)e.block+=(S.asc9&&e.key==='axe'?6:S.asc9&&e.key==='whelp'?8:m.block);
     if(m.tangled)S.tangled=(S.tangled||0)+m.tangled;
+   }else{
+    await enemyCinematics.cast(e,m);
    }
+   await enemyCinematics.finish();
    if(kind==='buff'){
     if(m.strength){let amount=e.key==='feeder'&&S.asc9?16:m.strength;e.strength+=amount;queueFX(e.id,amount,'buff')}
     if(m.block)e.block+=m.block;if(m.ritual)e.ritual+=m.ritual;
@@ -82,7 +89,7 @@ endTurn=async function(){
   for(let e of S.enemies){if(e.tempStrengthDown){e.strength+=e.tempStrengthDown;e.tempStrengthDown=0}}
   S.colossus=0;
   drawCards(5,true);log('Your turn');
- }finally{busy=false;save();render();triggerFX()}
+ }finally{enemyCinematics.cleanup();busy=false;save();render();triggerFX()}
 };
 // Avoid double-rounding when Weak and Vulnerable both affect one hit.
 // Strength is added before both multipliers, and floor happens once per hit.

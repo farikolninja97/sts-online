@@ -113,11 +113,11 @@ const relicCheckEndBase=checkEndBattle;
 checkEndBattle=function(){let wasBattle=S?.screen==='battle',clear=wasBattle&&S.hp>0&&S.enemies?.length&&alive().length===0;
  let result=relicCheckEndBase();
  if(clear&&S.screen==='reward'){
-  ensureRelics();S.lastRelicFound=null;
-  if(ownsRelic('amethyst_aubergine')){S.gold+=15;S.rewardGold=(S.rewardGold||0)+15}
+  ensureRelics();S.lastRelicFound=null;S.pendingBattleRelic=null;
+  if(ownsRelic('amethyst_aubergine')){S.rewardGold=(S.rewardGold||0)+15}
   if(S.room==='Elite'||S.room==='Boss'){
-   const id=relicRoll(S.room==='Boss'?'Rare':null);
-   if(id)gainRelic(id);
+   // Stage loot for an explicit claim after combat. Do not fire relic pickup hooks yet.
+   S.pendingBattleRelic=relicRoll(S.room==='Boss'?'Rare':null);
   }
   save();
  }

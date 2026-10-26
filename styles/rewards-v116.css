@@ -1,0 +1,53 @@
+/* V1.16 — Loot panel and two-phase Smith. Only these views are affected. */
+.ed116-reward-page{display:grid;place-items:center;min-height:calc(100dvh - 160px);padding:clamp(20px,3vw,40px) 12px}
+.ed116-loot-scene{width:min(560px,100%);text-align:center;position:relative;animation:ed116-arrive .28s ease-out both}
+@keyframes ed116-arrive{from{opacity:.3;transform:translateY(12px)}to{opacity:1;transform:none}}
+.ed116-loot-label{font:800 11px/1.6 system-ui,sans-serif;letter-spacing:.24em;color:#dbac71;text-align:center}
+.ed116-ribbon{background:linear-gradient(100deg,#a58153,#f0d4a0 37%,#d7b47e 68%,#917046);border:2px solid #704926;color:#442b1c;box-shadow:0 7px 25px #0008,inset 0 1px #fff5;clip-path:polygon(0 13%,6% 0,94% 0,100% 13%,96% 87%,90% 100%,10% 100%,4% 87%);font:900 clamp(29px,5vw,42px) Georgia,serif;margin:8px auto 18px;padding:14px 25px;width:min(350px,85%)}
+.ed116-fallen{font:13px/1.5 system-ui,sans-serif;color:#b5b3a8;margin:0 auto 15px}
+.ed116-loot-panel{padding:16px;background:linear-gradient(160deg,#1d2b35,#0c151f);border:3px solid #7e6850;box-shadow:inset 0 0 0 2px #283947,0 21px 45px #000b;border-radius:13px;display:flex;flex-direction:column;gap:8px}
+.ed116-loot-row{width:100%;display:flex;align-items:center;gap:12px;text-align:left;min-height:70px;border:1px solid #527781;background:linear-gradient(#244b59,#17313f);border-radius:9px;padding:10px;transition:background .2s,border-color .2s}
+.ed116-loot-row:not(.is-done):hover{border-color:#b8cc9e;background:linear-gradient(#2b5a62,#183e4b)}
+.ed116-loot-row.is-done{background:#1e3035;border-color:#4e5d59;opacity:.79}
+.ed116-loot-icon{flex:0 0 49px;width:49px;height:47px;display:grid;place-items:center;background:#111b25;border:1px solid #857052;border-radius:8px;font-size:27px;color:#e6b86b}
+.ed116-loot-description{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.ed116-loot-description strong{font:bold 16px Georgia,serif;color:#f5e8d3}
+.ed116-loot-description span{font:11px/1.4 system-ui,sans-serif;color:#b9ccd0}
+.ed116-claim,.ed116-skip{flex-shrink:0;font:800 12px system-ui,sans-serif;color:#f1e3c5;border:1px solid #c6a16c;background:linear-gradient(#715235,#3b302b);padding:10px 12px;border-radius:7px;cursor:pointer}
+.ed116-claim:hover,.ed116-skip:hover{filter:brightness(1.2)}
+.ed116-claim:disabled{opacity:.4;cursor:not-allowed}
+.ed116-skip{border-color:#546b72;background:#172b38;color:#c2d3d4;padding:6px 9px}
+.ed116-loot-actions{display:flex;align-items:center;gap:5px;flex-direction:column}
+.ed116-claimed{font:bold 12px system-ui,sans-serif;color:#99d6ab;white-space:nowrap}
+.ed116-loot-footer{margin:18px auto 0;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.ed116-loot-footer>span{font:700 12px system-ui,sans-serif;color:#b7a68a}
+.ed116-help{font:11px/1.5 system-ui,sans-serif;color:#adb0ae;margin:12px 0}
+.ed116-choice-dialog{text-align:center;max-width:760px;max-height:94dvh}
+.ed116-choice-dialog .reward-cards{margin:12px 0;gap:10px}
+.ed116-return{display:block;margin:12px auto 0}
+.ed116-big-relic{font-size:82px;margin:12px 0;filter:drop-shadow(0 8px 15px #000)}
+.ed116-relic-dialog{text-align:center;max-width:450px}
+.ed116-relic-dialog p{font:14px/1.6 system-ui,sans-serif}
+.ed116-smith-modal{max-width:920px;max-height:91dvh}
+.ed116-smith-modal h2,.ed116-upgrade-dialog h2{text-align:center}
+.ed116-smith-modal>.note{text-align:center}
+.ed116-smith-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:11px;max-height:55dvh;overflow:auto;padding:8px 3px 18px;margin:16px 0}
+.ed116-smith-tile{background:linear-gradient(#633d30,#271d25);border:2px solid #a97755;border-radius:10px;min-height:178px;display:flex;align-items:center;flex-direction:column;justify-content:space-between;padding:10px 7px;color:#f3dfc8;transition:transform .12s,border-color .12s}
+.ed116-smith-tile:hover,.ed116-smith-tile:focus-visible{transform:translateY(-4px);border-color:#efc57e;outline:none}
+.ed116-mini-energy{font:900 19px Georgia,serif;border:2px solid #f0be82;background:#6b3726;border-radius:50%;width:29px;height:29px;display:grid;place-items:center}
+.ed116-mini-art{min-height:75px;width:100%;display:grid;place-items:center}
+.ed116-mini-art svg{width:100%;height:80px}
+.ed116-smith-tile b{font:800 13px Georgia,serif}
+.ed116-smith-tile small{font:10px system-ui,sans-serif;color:#dec18f}
+.ed116-upgrade-dialog{max-width:650px;text-align:center;max-height:95dvh}
+.ed116-preview-compare{display:flex;gap:14px;justify-content:center;align-items:center;overflow:hidden;margin:14px 0 7px}
+.ed116-preview-compare>div{min-width:0;flex:0 1 180px}
+.ed116-compare-label{font:800 11px system-ui,sans-serif;letter-spacing:.17em;color:#e9c589;margin-bottom:6px}
+.ed116-preview-compare .card{width:100%;max-width:180px;height:246px;transform:none;margin:0 auto;pointer-events:none}
+.ed116-preview-compare .card .card-desc{font-size:11px}
+.ed116-preview-arrow{color:#edbf73;font-size:32px;flex-shrink:0}
+.ed116-confirm-buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:18px 0 3px}
+@media(max-width:560px){.ed116-reward-page{padding:10px 7px;min-height:calc(100dvh - 160px)}.ed116-loot-panel{padding:9px;gap:6px}.ed116-loot-row{padding:8px;min-height:65px;gap:8px}.ed116-loot-description strong{font-size:13px}.ed116-loot-icon{flex-basis:40px;width:40px;height:42px;font-size:23px}.ed116-claim{font-size:11px;padding:9px 8px}.ed116-claimed{font-size:10px}.ed116-fallen{font-size:11px}.ed116-ribbon{margin:5px auto 9px;padding:9px 20px}.ed116-upgrade-dialog{padding:12px}.ed116-preview-compare{gap:5px}.ed116-preview-compare>div{flex:1 1 0}.ed116-preview-compare .card{height:202px}.ed116-preview-compare .card .card-desc{font-size:9px}.ed116-preview-arrow{font-size:20px}.ed116-confirm-buttons .btn{font-size:11px;padding:11px 9px}}
+@media(max-height:710px){.ed116-loot-row{min-height:55px}.ed116-loot-icon{height:37px}.ed116-loot-panel{gap:5px}.ed116-preview-compare .card{height:182px}.ed116-smith-grid{max-height:48dvh}}
+
+@media (max-width:560px) and (max-height:710px){.ed116-reward-page{padding:3px 7px}.ed116-loot-scene{transform:translateY(0)}.ed116-loot-row{min-height:53px}.ed116-loot-panel{padding:6px;gap:4px}.ed116-loot-row{padding:5px 7px}.ed116-loot-icon{height:33px;width:36px;flex-basis:36px;font-size:21px}.ed116-fallen{margin-bottom:6px}.ed116-loot-footer{margin-top:8px}.ed116-ribbon{padding:5px 15px}.ed116-help{margin:5px 0}}

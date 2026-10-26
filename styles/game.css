@@ -327,3 +327,21 @@ body.oncombat .mast .topstats .relic-open{padding:4px 6px!important;font-size:11
 }
 @media(max-height:720px) and (max-width:600px){.cast-preview{bottom:calc(113px + env(safe-area-inset-bottom,0px))}}
 @media(prefers-reduced-motion:reduce){.card,.drag-card-ghost,.enemy-wrap.drop-ready,.random-exhaust-reveal{animation:none!important;transition:none!important}}
+
+/* V1.14 — enemy turns read as attacks, not instant HP changes. All visuals are original. */
+.enemy-cinematic-caption{position:absolute;top:56px;left:50%;transform:translateX(-50%);width:max-content;max-width:64%;pointer-events:none;z-index:23;display:flex;flex-direction:column;gap:3px;text-align:center;padding:7px 13px;border:1px solid #e2b87cae;border-radius:10px;background:#111b25ed;box-shadow:0 7px 25px #000b,0 0 21px #e57c283c;color:#fff0cd;animation:enemy-caption-in .22s ease-out both;user-select:none}
+.enemy-cinematic-caption strong{font:800 11px system-ui,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#d8ac7a}.enemy-cinematic-caption span{font:900 clamp(11px,1.5vw,15px) system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.enemy-cinematic-caption.support{border-color:#88a3d6c0;box-shadow:0 7px 25px #000b,0 0 21px #6a90db45}.enemy-cinematic-caption.fade{animation:enemy-caption-out .1s ease-in forwards}
+.enemy-cinematic-ghost{position:fixed;z-index:10;pointer-events:none;transform-origin:center 85%;filter:drop-shadow(0 5px 10px #000b);will-change:transform}
+.enemy-cinematic-ghost svg{width:100%;height:100%;overflow:visible}.enemy-charge-ring{position:fixed;z-index:6;pointer-events:none;width:115px;height:115px;transform:translate(-50%,-50%);border:5px solid #ffa768a8;border-radius:50%;box-shadow:0 0 28px #ff9e527d,inset 0 0 22px #e882485e;animation:enemy-charge-pulse .55s ease-out both}
+.enemy-charge-ring.magic,.enemy-charge-ring.ranged{border-color:#9bc8ffaa;box-shadow:0 0 25px #6aa2ff7a,inset 0 0 22px #9db9ff65}
+.enemy-cinematic-bolt{position:fixed;z-index:13;pointer-events:none;transform-origin:0 center;width:55px;height:9px;border-radius:50%;background:linear-gradient(90deg,transparent,#f9d8a1 44%,#fffdf1 86%,#ffe0ac);box-shadow:0 0 13px 5px #e5b87480,0 0 24px #ef904d5e;will-change:transform}
+.enemy-cinematic-bolt.magic{height:19px;width:38px;background:radial-gradient(ellipse at 67% 50%,#fff,#bbf1ff 20%,#8f79ee 56%,transparent);box-shadow:0 0 25px 10px #9875ee9c}
+.enemy-cast-orb{position:fixed;pointer-events:none;z-index:12;width:78px;height:78px;transform:translate(-50%,-50%);border:4px solid #cfa7ffc9;border-radius:50%;box-shadow:0 0 22px #a17ff2,inset 0 0 20px #edcfff;animation:enemy-cast-pulse .63s ease-out forwards}
+.enemy-cast-orb.buff{border-color:#a4f0b6;color:#a4f0b6;box-shadow:0 0 22px #7fcc91,inset 0 0 20px #cdf6ad}
+body.enemy-impact-frame .arena{filter:brightness(1.12) contrast(1.06)}
+@keyframes enemy-caption-in{from{opacity:0;transform:translate(-50%,-10px) scale(.95)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes enemy-caption-out{to{opacity:0;transform:translate(-50%,-8px)}}
+@keyframes enemy-charge-pulse{0%{opacity:0;scale:.48}25%{opacity:.85}100%{opacity:0;scale:1.35}}
+@keyframes enemy-cast-pulse{0%{opacity:0;scale:.35}30%{opacity:1;scale:1}100%{opacity:0;scale:1.6}}
+@media(max-width:600px){.enemy-cinematic-caption{top:58px;max-width:69%;padding:5px 8px}.enemy-cinematic-caption strong{font-size:9px}.enemy-cinematic-caption span{font-size:11px}.enemy-charge-ring{width:68px;height:68px}.enemy-cast-orb{width:50px;height:50px}}
+@media(prefers-reduced-motion:reduce){.enemy-charge-ring,.enemy-cast-orb,.enemy-cinematic-caption{animation:none!important}.enemy-cinematic-ghost,.enemy-cinematic-bolt{display:none!important}body.enemy-impact-frame .arena{filter:none!important}}
