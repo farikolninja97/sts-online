@@ -1,61 +1,189 @@
-// Touch and mouse drag targeting; click fallback.
-function isTargetedCard(c){if(!c)return false;let d=spec(c);return d.type==='Attack'&&!d.aoe&&!['whirlwind','conflag','swordboom','stomp','breakthrough','howl','pactsend','thunder'].includes(c.key)||['taunt','tremble','dominate','molten'].includes(c.key)}
-function setTargetMode(uid){chosenTargetCard=uid;document.body.classList.toggle('choosing-target',!!uid);document.querySelectorAll('.selected-cast').forEach(el=>el.classList.remove('selected-cast'));
- if(uid){let el=document.querySelector(`[data-play="${uid}"]`);if(el)el.classList.add('selected-cast')}document.getElementById('targeting-banner')?.remove();
- if(uid){let t=document.createElement('div');t.id='targeting-banner';t.className='targeting-banner';t.innerHTML='Choose an enemy or drag the card onto one <button type="button" data-cancel-target>Cancel</button>';document.body.appendChild(t)}
+// V1.13 — Unified pointer interaction controller for mouse, touch and pen.
+// Horizontal gestures scroll the hand; vertical gestures lift and drag cards.
+// One tap selects and previews a card; the second tap casts non-targeted cards.
+// Attacks can be dragged to foes or tapped to select, then tapped on a foe.
+function isTargetedCard(c){
+ if(!c)return false;
+ const d=spec(c);
+ return (d.type==='Attack'&&!d.aoe&&!['whirlwind','conflag','swordboom','stomp','breakthrough','howl','pactsend','thunder'].includes(c.key))||['taunt','tremble','dominate','molten'].includes(c.key);
 }
-function commitTargetCard(uid,enemyId){if(S?.screen!=='battle'||busy)return;let card=S.hand.find(c=>c.uid===uid),enemy=S.enemies.find(e=>e.id===enemyId&&e.hp>0);if(!card||!enemy)return;S.target=S.enemies.indexOf(enemy);setTargetMode(null);playCard(uid)}
-function cleanDrag(){if(dragGhost){dragGhost.remove();dragGhost=null}if(dragLine){dragLine.remove();dragLine=null}document.querySelectorAll('.drop-ready').forEach(x=>x.classList.remove('drop-ready'));cardPointer=null}
-function fitHand(){if(S?.screen!=='battle')return;let wrap=document.querySelector('.hand-wrap');if(!wrap)return;let cards=[...wrap.querySelectorAll('.card')],count=cards.length;
- if(!count)return;let narrow=window.matchMedia('(max-width:600px)').matches;if(!narrow){cards.forEach(el=>el.style.marginLeft='');return}
- let width=window.innerWidth,short=window.innerHeight<=720,cardWidth=short?86:100,usable=width-14;
- cards.forEach((el,i)=>{el.style.marginLeft='0px';el.style.zIndex='1'})
+const gestureState={selected:null,hoverEnemy:null,startedAt:0};
+function currentCard(uid=chosenTargetCard){return S?.hand?.find(c=>c.uid===uid)||null}
+function cardCanPlay(c){if(!c||S?.screen!=='battle'||busy||modal||spec(c).unplayable)return false;const n=updatedCost(c);return n===-1||n<=S.energy}
+function clearCastPreview(){document.getElementById('cast-preview')?.remove()}
+function refreshCastPreview(){
+ clearCastPreview();if(!S||S.screen!=='battle'||modal||!chosenTargetCard)return;
+ const c=currentCard();if(!c)return;
+ const d=spec(c),foe=targetEnemy(),p=d.type==='Attack'?damagePreview(c,foe):null;
+ const el=document.createElement('aside');el.id='cast-preview';el.className='cast-preview';el.setAttribute('aria-live','polite');
+ el.innerHTML=`<div class="cast-summary"><b>${escapeHTML(d.name)}${c.up?'+':''}</b><span class="cast-description">${escapeHTML(d.desc)}</span>${p?`<strong class="cast-amount">⚔ ${p.perHit}${p.hits>1?' × '+p.hits:''} <small>${p.hpLoss} HP vs ${escapeHTML(p.enemyName)}</small></strong>`:''}</div><div class="cast-buttons">${isTargetedCard(c)?'<span class="cast-hint">Tap a foe</span>':`<button type="button" class="cast-go" data-cast-selected="1" ${cardCanPlay(c)?'':'disabled'}>Play</button>`}<button type="button" class="cast-info" data-cast-info="1" aria-label="Inspect full card">Details</button><button type="button" class="cast-close" data-cancel-target="1" aria-label="Deselect card">×</button></div>`;
+ document.body.appendChild(el);
 }
-const oldRender=render;
-render=function(){oldRender();if(!S||S.screen!=='battle'){chosenTargetCard=null;cleanDrag();document.body.classList.remove('choosing-target');document.getElementById('targeting-banner')?.remove()}
- if(S?.screen==='battle'){requestAnimationFrame(()=>{fitHand();if(chosenTargetCard&&!S.hand.find(c=>c.uid===chosenTargetCard))setTargetMode(null);else if(chosenTargetCard)setTargetMode(chosenTargetCard)})}}
-function makeDragGhost(source,clientX,clientY){dragGhost=source.cloneNode(true);dragGhost.classList.add('drag-card-ghost');dragGhost.removeAttribute('data-play');dragGhost.style.width=source.getBoundingClientRect().width+'px';dragGhost.style.height=source.getBoundingClientRect().height+'px';document.body.appendChild(dragGhost);
- if(isTargetedCard(S.hand.find(c=>c.uid===cardPointer?.id))){dragLine=document.createElementNS('http://www.w3.org/2000/svg','svg');dragLine.setAttribute('class','drag-aim-line');dragLine.innerHTML='<defs><marker id="aimhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#ffd082"/></marker></defs><path id="aimpath" stroke="#ffd082" stroke-width="4" stroke-linecap="round" fill="none" stroke-dasharray="9 5" marker-end="url(#aimhead)"/>';document.body.appendChild(dragLine)}positionDrag(clientX,clientY)}
-function positionDrag(x,y){if(!dragGhost)return;dragGhost.style.left=x+'px';dragGhost.style.top=y+'px';const p=dragLine?.querySelector('#aimpath');if(p){let box=cardPointer?.source?.getBoundingClientRect();let cx=(box?.left||x)+(box?.width||0)/2,cy=(box?.top||y)+(box?.height||0)/2;p.setAttribute('d',`M ${cx} ${cy} Q ${(cx+x)/2} ${Math.min(cy,y)-60} ${x} ${y}`)}
- document.querySelectorAll('.drop-ready').forEach(x=>x.classList.remove('drop-ready'));let target=document.elementFromPoint(x,y)?.closest('[data-enemy]');if(target)target.classList.add('drop-ready')}
-document.addEventListener('pointerdown',e=>{if(S?.screen!=='battle'||busy||modal)return;let source=e.target.closest('[data-play]');if(!source||e.button!==0)return;let id=source.dataset.play,c=S.hand.find(x=>x.uid===id);if(!c||spec(c).unplayable||(updatedCost(c)!==-1&&updatedCost(c)>S.energy))return;cardPointer={id,source,x:e.clientX,y:e.clientY,pid:e.pointerId,dragging:false}},true);
-document.addEventListener('pointermove',e=>{if(!cardPointer||e.pointerId!==cardPointer.pid)return;let dx=e.clientX-cardPointer.x,dy=e.clientY-cardPointer.y;if(!cardPointer.dragging&&Math.abs(dx)>11&&Math.abs(dx)>Math.abs(dy)*1.45&&e.pointerType==='touch'){cardPointer=null;return}
- if(!cardPointer.dragging&&Math.hypot(dx,dy)>11){cardPointer.dragging=true;if(isTargetedCard(S.hand.find(c=>c.uid===cardPointer.id)))setTargetMode(cardPointer.id);else setTargetMode(null);makeDragGhost(cardPointer.source,e.clientX,e.clientY)}
- if(cardPointer?.dragging){e.preventDefault();positionDrag(e.clientX,e.clientY)}},{capture:true,passive:false});
-document.addEventListener('pointerup',e=>{if(!cardPointer||cardPointer.pid!==e.pointerId)return;const info=cardPointer,dragged=info.dragging;let target=dragged?document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-enemy]'):null;cleanDrag();if(dragged){lastDragClickBlock=Date.now()+450;
- let c=S.hand.find(x=>x.uid===info.id),aimed=isTargetedCard(c),hit=document.elementFromPoint(e.clientX,e.clientY);
- if(aimed){if(target)commitTargetCard(info.id,Number(target.dataset.enemy));else setTargetMode(null)}
- else if(c&&hit?.closest('.arena,.fighter-zone,.combat-meta,.combat-toolbar')){setTargetMode(null);playCard(info.id)}
- else setTargetMode(null);
- }},true);
-document.addEventListener('pointercancel',()=>{cleanDrag()},true);
-// Run before legacy delegated click-to-play. Targeted attacks tap-to-select; drags play on drop.
+function setTargetMode(uid){
+ chosenTargetCard=uid&&currentCard(uid)?uid:null;
+ document.body.classList.toggle('choosing-target',!!chosenTargetCard&&isTargetedCard(currentCard()));
+ document.querySelectorAll('.selected-cast').forEach(el=>el.classList.remove('selected-cast'));
+ if(chosenTargetCard){let el=[...document.querySelectorAll('[data-play]')].find(x=>x.dataset.play===chosenTargetCard);el?.classList.add('selected-cast')}
+ refreshCastPreview();
+}
+function commitTargetCard(uid,enemyId){
+ if(!cardCanPlay(currentCard(uid)))return;
+ const enemy=S.enemies.find(e=>e.id===enemyId&&e.hp>0);if(!enemy)return;
+ S.target=S.enemies.indexOf(enemy);setTargetMode(null);playCard(uid);
+}
+function clearDragHighlights(){
+ document.querySelectorAll('.drop-ready,.drag-origin').forEach(el=>el.classList.remove('drop-ready','drag-origin'));
+ document.getElementById('drag-damage-readout')?.remove();
+ document.getElementById('drag-cast-note')?.remove();
+}
+function cleanDrag(){
+ dragGhost?.remove();dragGhost=null;dragLine?.remove();dragLine=null;
+ clearDragHighlights();cardPointer=null;gestureState.hoverEnemy=null;
+ document.body.classList.remove('dragging-card');
+}
+function fitHand(){
+ if(S?.screen!=='battle')return;
+ document.querySelectorAll('.hand-wrap .card').forEach(el=>{el.style.marginLeft='';el.style.zIndex=''});
+}
+const v113UnderlyingRender=render;
+render=function(){
+ v113UnderlyingRender();
+ if(S?.screen!=='battle'){chosenTargetCard=null;cleanDrag();clearCastPreview();return}
+ // Never rebuild the hand during an active drag. Refresh after card resolution.
+ if(chosenTargetCard&&!currentCard())chosenTargetCard=null;
+ requestAnimationFrame(()=>{fitHand();if(!cardPointer?.dragging)setTargetMode(chosenTargetCard)});
+};
+function foeAt(x,y){
+ const el=document.elementFromPoint(x,y)?.closest('[data-enemy]');
+ if(!el)return null;
+ return S.enemies.find(e=>e.id===Number(el.dataset.enemy)&&e.hp>0)||null;
+}
+function createDragGhost(source,x,y){
+ dragGhost=source.cloneNode(true);dragGhost.classList.add('drag-card-ghost');dragGhost.removeAttribute('data-play');
+ dragGhost.querySelector('[data-card-info]')?.remove();
+ const rect=source.getBoundingClientRect();dragGhost.style.width=rect.width+'px';dragGhost.style.height=rect.height+'px';
+ document.body.appendChild(dragGhost);source.classList.add('drag-origin');document.body.classList.add('dragging-card');
+ if(isTargetedCard(currentCard(cardPointer.id))){
+  dragLine=document.createElementNS('http://www.w3.org/2000/svg','svg');dragLine.setAttribute('class','drag-aim-line');
+  dragLine.innerHTML='<path id="aimpath" stroke="#ffd486" stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="8 7"/>';
+  document.body.appendChild(dragLine);
+ }
+ positionDrag(x,y);
+}
+function updateDragReadout(c,foe,x,y){
+ let readout=document.getElementById('drag-damage-readout');
+ if(!foe||spec(c).type!=='Attack'){
+  readout?.remove();return;
+ }
+ const p=damagePreview(c,foe);if(!p)return;
+ if(!readout){readout=document.createElement('div');readout.id='drag-damage-readout';readout.setAttribute('role','status');readout.className='drag-damage-readout';document.body.appendChild(readout)}
+ const conditions=[S.strength?`Strength ${S.strength>0?'+':''}${S.strength}`:'',S.weak>0?'Weak': '',foe.vulnerable>0?`Vulnerable ${foe.vulnerable}`:'',foe.block>0?`Block ${foe.block}`:''].filter(Boolean);
+ readout.innerHTML=`<small>${escapeHTML(foe.name)}</small><strong>⚔ ${p.perHit}${p.hits>1?` × ${p.hits}`:''}</strong><span>${p.hpLoss} projected HP damage</span>${conditions.length?`<em>${escapeHTML(conditions.join(' · '))}</em>`:''}`;
+ readout.style.left=Math.max(8,Math.min(window.innerWidth-195,x-90))+'px';
+ readout.style.top=Math.max(8,Math.min(window.innerHeight-132,y-210))+'px';
+ const badge=dragGhost?.querySelector('.v109-damage');
+ if(badge){badge.innerHTML=`<b>⚔ ${p.perHit}</b>${p.hits>1?`<em>×${p.hits}</em>`:''}<small>${p.hpLoss} HP</small>`;badge.title=p.accessible}
+ const desc=dragGhost?.querySelector('.card-desc');if(desc)desc.innerHTML=liveCardDescription(spec(c).desc,p);
+}
+function positionDrag(x,y){
+ if(!dragGhost||!cardPointer)return;
+ dragGhost.style.left=x+'px';dragGhost.style.top=y+'px';
+ const path=dragLine?.querySelector('#aimpath');
+ if(path){const rect=cardPointer.source.getBoundingClientRect();const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  path.setAttribute('d',`M ${cx} ${cy} Q ${(cx+x)/2} ${Math.min(cy,y)-60} ${x} ${y}`)}
+ const foe=foeAt(x,y);gestureState.hoverEnemy=foe?.id??null;
+ document.querySelectorAll('.drop-ready').forEach(el=>el.classList.remove('drop-ready'));
+ if(foe&&isTargetedCard(currentCard(cardPointer.id))){const el=[...document.querySelectorAll('[data-enemy]')].find(n=>Number(n.dataset.enemy)===foe.id);el?.classList.add('drop-ready')}
+ const c=currentCard(cardPointer.id);if(c)updateDragReadout(c,foe,x,y);
+ if(!isTargetedCard(c)){
+  const zone=document.querySelector('.hand-area');const release=(zone?y<zone.getBoundingClientRect().top-5:y<window.innerHeight*.70);
+  let note=document.getElementById('drag-cast-note');if(!note){note=document.createElement('div');note.id='drag-cast-note';note.className='drag-cast-note';document.body.appendChild(note)}
+  note.textContent=release?'Release to play':'Drag upward to play';note.classList.toggle('cast-ready',release);
+ }
+}
+function beginDrag(e,source,c){
+ cardPointer.dragging=true;setTargetMode(c.uid);
+ try{source.setPointerCapture(e.pointerId)}catch(_){}
+ createDragGhost(source,e.clientX,e.clientY);
+}
+document.addEventListener('pointerdown',e=>{
+ if(S?.screen!=='battle'||busy||modal||e.button!==0)return;
+ const source=e.target.closest('[data-play]');if(!source||e.target.closest('[data-card-info]'))return;
+ const c=currentCard(source.dataset.play);if(!c)return;
+ cardPointer={id:c.uid,source,x:e.clientX,y:e.clientY,pid:e.pointerId,dragging:false,axis:null,pointerType:e.pointerType};
+},true);
+document.addEventListener('pointermove',e=>{
+ if(!cardPointer||e.pointerId!==cardPointer.pid)return;
+ const p=cardPointer,dx=e.clientX-p.x,dy=e.clientY-p.y;
+ if(!p.dragging){
+  if(p.pointerType==='touch'&&Math.abs(dx)>13&&Math.abs(dx)>Math.abs(dy)*1.15){cardPointer=null;return}
+  if(Math.hypot(dx,dy)<10)return;
+  if(p.pointerType==='touch'&&dy>8&&Math.abs(dy)>Math.abs(dx)*1.4){cardPointer=null;return} // allow downward page scroll
+  const c=currentCard(p.id);if(!c||!cardCanPlay(c)){cardPointer=null;return}
+  beginDrag(e,p.source,c);
+ }
+ if(cardPointer?.dragging){e.preventDefault();positionDrag(e.clientX,e.clientY)}
+},{capture:true,passive:false});
+document.addEventListener('pointerup',e=>{
+ if(!cardPointer||cardPointer.pid!==e.pointerId)return;
+ const p=cardPointer,dragged=p.dragging,c=currentCard(p.id);
+ const foe=dragged?foeAt(e.clientX,e.clientY):null;
+ const handTop=document.querySelector('.hand-area')?.getBoundingClientRect().top??(window.innerHeight*.70);
+ const wasUp=e.clientY<handTop-5;
+ if(dragged){
+  gestureState.suppressedClick={uid:p.id,until:Date.now()+220};
+  cleanDrag();
+  if(!c)return;
+  if(isTargetedCard(c)){
+   if(foe)commitTargetCard(c.uid,foe.id);
+   else setTargetMode(c.uid); // missed target: keep selected, never auto-hit wrong foe
+  }else if(wasUp){setTargetMode(null);playCard(c.uid)}
+  else setTargetMode(c.uid);
+ }
+},true);
+document.addEventListener('pointercancel',()=>{if(cardPointer){cleanDrag();setTargetMode(null)}},true);
 document.addEventListener('click',e=>{
  if(e.target.closest('[data-cancel-target]')){e.preventDefault();e.stopImmediatePropagation();setTargetMode(null);return}
- let cardEl=e.target.closest('[data-play]');if(cardEl&&S?.screen==='battle'&&!modal){
- e.preventDefault();e.stopImmediatePropagation();
- let c=S.hand.find(c=>c.uid===cardEl.dataset.play);
- if(c&&Date.now()>lastDragClickBlock){modal={type:'cardinspect',id:c.uid,from:'battle'};render()}
- return;
-}
- let enemy=e.target.closest('[data-enemy]');if(enemy&&chosenTargetCard&&S?.screen==='battle'){e.preventDefault();e.stopImmediatePropagation();commitTargetCard(chosenTargetCard,Number(enemy.dataset.enemy))}
+ if(e.target.closest('[data-cast-info],[data-card-info]')){
+  e.preventDefault();e.stopImmediatePropagation();
+  const uid=e.target.closest('[data-card-info]')?.dataset.cardInfo||chosenTargetCard;
+  if(currentCard(uid)){modal={type:'cardinspect',id:uid,from:'battle'};setTargetMode(null);render()}
+  return;
+ }
+ if(e.target.closest('[data-cast-selected]')){
+  e.preventDefault();e.stopImmediatePropagation();const c=currentCard();if(cardCanPlay(c)&&!isTargetedCard(c)){setTargetMode(null);playCard(c.uid)}return;
+ }
+ const cardEl=e.target.closest('[data-play]');
+ if(cardEl&&S?.screen==='battle'&&!modal){
+  e.preventDefault();e.stopImmediatePropagation();
+  if(gestureState.suppressedClick?.uid===cardEl.dataset.play&&Date.now()<gestureState.suppressedClick.until)return;
+  const c=currentCard(cardEl.dataset.play);if(!c)return;
+  if(chosenTargetCard===c.uid&&!isTargetedCard(c)&&cardCanPlay(c)){setTargetMode(null);playCard(c.uid)}
+  else setTargetMode(c.uid);
+  return;
+ }
+ const enemyEl=e.target.closest('[data-enemy]');
+ if(enemyEl&&chosenTargetCard&&S?.screen==='battle'){
+  e.preventDefault();e.stopImmediatePropagation();const c=currentCard();
+  if(isTargetedCard(c))commitTargetCard(c.uid,Number(enemyEl.dataset.enemy));
+  else{S.target=S.enemies.findIndex(q=>q.id===Number(enemyEl.dataset.enemy));save();render()}
+ }
 },true);
-document.addEventListener('click',e=>{let t=e.target.closest('[data-catalog-entry]');if(t)return},true);
-document.addEventListener('input',e=>{if(e.target?.matches('[data-catalog-search]')){let q=e.target.value.toLowerCase();document.querySelectorAll('[data-catalog-entry]').forEach(el=>el.hidden=!el.dataset.catalogEntry.includes(q))}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){setTargetMode(null)}},true);
+document.addEventListener('input',e=>{if(e.target?.matches('[data-catalog-search]')){const q=e.target.value.toLowerCase();document.querySelectorAll('[data-catalog-entry]').forEach(el=>el.hidden=!el.dataset.catalogEntry.includes(q))}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal?.type==='cardreveal'){e.preventDefault();e.stopImmediatePropagation();revealNext()}},true);
 window.addEventListener('resize',()=>requestAnimationFrame(fitHand));
-
-
-// Reveals for shop acquisitions and the random forge event (before the original delegated handlers).
+// Keep compatibility with cards acquired in the merchant and random card-upgrade events.
 document.addEventListener('click',e=>{
- let buy=e.target.closest('[data-buy]');if(buy&&S?.screen==='shop'){
-  e.preventDefault();e.stopImmediatePropagation();let i=Number(buy.dataset.buy),key=S.shopOffers?.[i];if(!key||S.gold<55)return;
-  S.gold-=55;let card=newCard(key);S.deck.push(card);S.shopOffers.splice(i,1);showCardReveal(card,'Card purchased','This card has been added to your permanent deck.','close');return;
+ const buy=e.target.closest('[data-buy]');if(buy&&S?.screen==='shop'){
+  e.preventDefault();e.stopImmediatePropagation();const i=Number(buy.dataset.buy),key=S.shopOffers?.[i];if(!key||S.gold<55)return;
+  S.gold-=55;const card=newCard(key);S.deck.push(card);S.shopOffers.splice(i,1);
+  showCardReveal(card,'Card purchased','Added to your permanent deck.','close');return;
  }
- let forge=e.target.closest('[data-event="forge"]');if(forge&&S?.screen==='event'){
-  e.preventDefault();e.stopImmediatePropagation();let pool=S.deck.filter(c=>!c.up&&UP[c.key]);if(!pool.length){showToast('No eligible cards to upgrade');moveToNext();return}
-  let c=choice(pool),before={...c};c.up=true;showCardReveal(c,'Random card upgraded','The Cinder Altar strengthened one randomly selected card.','route',before);return;
+ const forge=e.target.closest('[data-event="forge"]');if(forge&&S?.screen==='event'){
+  e.preventDefault();e.stopImmediatePropagation();const pool=S.deck.filter(c=>!c.up&&UP[c.key]);
+  if(!pool.length){showToast('No eligible cards to upgrade');moveToNext();return}
+  const c=choice(pool),before={...c};c.up=true;
+  showCardReveal(c,'Random card upgraded','The Cinder Altar strengthened one randomly selected card.','route',before);
  }
 },true);
-
-

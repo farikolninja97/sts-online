@@ -40,7 +40,7 @@ function applyCard(c,opt={}){vfxActiveCard=c.key;if(S.screen!=='battle')return;l
  const useAttack=()=>{if(d.type!=='Attack')return;if(randomHits){for(let i=0;i<randomHits;i++){let t=choice(alive());if(t)killed=attack(t,base)||killed}}else if(aoe){for(let i=0;i<hits;i++)for(let t of [...alive()])killed=attack(t,base)||killed}else if(hits>0)killed=attack(enemy,base,hits)};
  if(c.key==='ironwave')gainBlock(d.block||5);
  useAttack();
- if(c.key==='thrash'){let choices=S.hand.filter(x=>spec(x).type==='Attack');if(choices.length){let sacrificed=choice(choices);S.hand.splice(S.hand.indexOf(sacrificed),1);c.bonus=(c.bonus||0)+(spec(sacrificed).dmg||0);exhaustCard(sacrificed)}}
+ if(c.key==='thrash'){let choices=S.hand.filter(x=>spec(x).type==='Attack');if(choices.length){let sacrificed=choice(choices);S.hand.splice(S.hand.indexOf(sacrificed),1);c.bonus=(c.bonus||0)+(spec(sacrificed).dmg||0);exhaustCard(sacrificed);showRandomExhaust(sacrificed,'Thrash')}}
   // The repeated play resolves after the original attack's on-hit effects.
  if(d.type==='Attack'&&S.rage){gainBlock(S.rage,'effect');log(`Rage: +${S.rage} Block`)}
  switch(c.key){
@@ -72,8 +72,8 @@ function applyCard(c,opt={}){vfxActiveCard=c.key;if(S.screen!=='battle')return;l
  case 'onetwo':S.oneTwo+=c.up?2:1;break;
  case 'infernal':{let k=choice(SOLO_POOL.filter(x=>CARDS[x].type==='Attack'));if(k&&S.hand.length<10){let a=newCard(k);a.tempFree=true;S.hand.push(a)}break}
  case 'armaments':if(c.up)S.hand.forEach(x=>{if(UP[x.key])x.up=true});else if(S.hand.some(x=>!x.up&&UP[x.key]))modal={type:'upgradehand'};break;
- case 'truegrit':if(S.hand.length){if(c.up)chooseExhaustFromHand();else exhaustCard(S.hand.splice(Math.floor(Math.random()*S.hand.length),1)[0])}break;
- case 'cinder':if(S.hand.length)exhaustCard(S.hand.splice(Math.floor(Math.random()*S.hand.length),1)[0]);break;
+ case 'truegrit':if(S.hand.length){if(c.up)chooseExhaustFromHand();else {const removed=S.hand.splice(Math.floor(Math.random()*S.hand.length),1)[0];exhaustCard(removed);showRandomExhaust(removed,'True Grit')}}break;
+ case 'cinder':if(S.hand.length){const removed=S.hand.splice(Math.floor(Math.random()*S.hand.length),1)[0];exhaustCard(removed);showRandomExhaust(removed,'Cinder')}break;
  case 'burningpact':{let n=c.up?3:2;if(S.hand.length){modal={type:'chooseExhaust',afterDraw:n}}else drawCards(n);break}
  case 'headbutt':if(S.discard.length)modal={type:'discardtop'};break;
  case 'havoc':{let next=popDraw();if(next)applyCard(next,{free:true,cost:0,forcedExhaust:true});break}

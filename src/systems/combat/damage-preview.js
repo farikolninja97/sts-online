@@ -6,7 +6,7 @@
 function damagePreview(c,e){
  if(!S||S.screen!=='battle'||!c||spec(c).type!=='Attack'||!e||e.hp<=0)return null;
  const d=spec(c),key=c.key;
- const chosen=targetEnemy(), selectedIsSentinel=chosen?.id===e.id && chosen?.key==='sentinel';
+ const selectedIsSentinel=e.key==='sentinel';
  let base=(d.dmg||0)+(c.bonus||0),hits=1,random=false,aoe=!!d.aoe;
  switch(key){
   case 'body':base=S.block||0;break;
