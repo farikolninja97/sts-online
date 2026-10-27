@@ -29,7 +29,7 @@ function receiveDamage(amount,{attack=false,source=null,blockable=attack}={}){
  let blocked=blockable?Math.min(S.block,value):0;
  if(blockable)S.block-=blocked;
  let actual=Math.min(S.hp,Math.max(0,value-blocked));S.hp-=actual;
- if(attack&&actual>0&&S.plating>0)S.plating--;
+ // Plating does not wear off on damage; it loses one stack at the start of the owner's turn.
  if(attack&&S.flame>0&&source?.hp>0)hurtEnemy(source,S.flame,false);
  if(actual>0){S.turnHpLoss=(S.turnHpLoss||0)+actual;S.lossCount=(S.lossCount||0)+1;
    if(S.turnPhase==='player'){

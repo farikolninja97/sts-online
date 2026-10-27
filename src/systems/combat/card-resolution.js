@@ -52,7 +52,7 @@ function applyCard(c,opt={}){vfxActiveCard=c.key;if(S.screen!=='battle')return;l
  case 'molten':if(enemy?.hp>0)enemy.vulnerable*=2;break;
  case 'setupstrike':{let n=c.up?3:2;S.strength+=n;S.tempStrength=(S.tempStrength||0)+n;break}
  case 'fightme':S.strength+=c.up?4:3;if(enemy?.hp>0)enemy.strength++;break;
- case 'mangle':if(enemy?.hp>0){let lowered=c.up?15:10;enemy.tempStrengthDown=(enemy.tempStrengthDown||0)+lowered;enemy.strength-=lowered}break;
+ case 'mangle':if(enemy?.hp>0)applyTemporaryStrengthLoss(enemy,c.up?15:10);break;
  case 'unrelenting':S.nextAttackFree=true;break;
  case 'bloodlet':grantEnergyV110(c.up?3:2);break;
  case 'forgotten':if(S.exhaustedThisTurn>0)grantEnergyV110(c.up?4:3);else log('Forgotten Ritual: no card Exhausted earlier this turn');break;

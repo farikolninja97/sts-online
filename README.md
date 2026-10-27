@@ -1,24 +1,21 @@
-# Ember Descent V1.20 — Individual Enemy AI & Honest Intents
+# Ember Descent V1.23 — Accurate Status Timers and Shrink
 
-Install: upload the **contents** of this folder to your GitHub Pages site root (including `index.html`, `src/` and `styles/`). Confirm **V1.20** in the footer after publishing.
-
-## What's new
-
-- All 52 original enemies have per-enemy move-selection policies, preserving normal/elite/boss encounters.
-- Some opponents use scripted patterns, some weighted move selection with no-repeat limits, some fixed attacks, and some condition-dependent behavior.
-- Intent is selected and saved at the start of the player turn, and it **does not switch** just because the player plays cards. This mirrors the telegraph-first principle of Slay the Spire 2.
-- Distinct boss phases and some unique reactions remain; reactions to your last turn now choose the upcoming move instead of unexpectedly changing the current move.
-- Damage numbers still update when Strength, Weak, Vulnerable and similar modifiers change; the planned action is stable.
-- Open **Intel** during battle to inspect the enemy's move style and current committed intent.
-- PRNG state and planned moves serialize in your run save. Existing `ember_descent_sts2_100` save key unchanged; old V1.19 saves can resume.
-
-**Accuracy note:** The game's 52 monsters have original names, appearances, and move tables. Their AI architecture follows documented STS2 design categories, but **these are not copies of the actual enemy AI**. 1:1 correctness needs an official-enemy-by-enemy rewrite/audit against a specific game patch, which this release does not claim.
+This is a **full GitHub Pages deployment ZIP**, based on V1.22, with V1.23 lifecycle fixes. It also restores `src/input/preview-targeting.js` (missing in the V1.22 ZIP) from V1.21.
 
 ## Installation
+1. Extract the archive.
+2. Upload **all files inside `github-pages/`** to the root of `farikolninja97/sts-online` on GitHub (`main` branch); keep directory structure intact.
+3. Wait for GitHub Pages to deploy. In Chrome try an Incognito tab to avoid stale cached JS. Check the bottom footer says **V1.23**.
+4. Existing saves use `ember_descent_sts2_100`; the save key is unchanged.
 
-1. Extract the ZIP and open `github-pages/`.
-2. Upload everything **inside** that folder to the GitHub Pages site root, replacing the previous version.
-3. Hard refresh or reopen the tab and confirm V1.20 in the footer.
-4. Resume a saved run or start a new one.
+## New status behavior
+- **Shrink from Shrinker Beetle:** the character gets small and deals 30% less Attack damage; the effect stays until its applying beetle dies. The actual game does **not** use a 3-turn expiration for this specific enemy.
+- **Beetle Juice:** applies 4 turns of timed Shrink to an enemy (additional copies add more turns). The 30% damage reduction is the same, not multiplied by remaining duration.
+- Weak, Vulnerable and Frail tick at end of enemy phase. Application during the enemy phase does not immediately lose duration on the player.
+- Tangled costs more for Attacks and ends completely at the end of the afflicted player's turn.
+- Plating grants Block at end of your turn and loses 1 stack at the next turn's start—not on damage.
+- Mangle's temporary Strength loss lasts for the afflicted enemy's next move, then ends.
+- Artifact blocks the next applicable debuff and consumes one charge.
 
-The `docs/` folder is for QA/checklists; it does not need to be deployed.
+## Testing
+See `QA_REPORT_V1.23.md`. The game remains an original fan prototype with authored Ember Descent enemies; successful status checks do not make its entire card and enemy collection 1:1 with Slay the Spire 2.

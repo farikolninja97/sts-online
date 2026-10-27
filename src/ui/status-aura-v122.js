@@ -3,7 +3,7 @@
    Intents, save data or enemy move decisions. */
 'use strict';
 const ED122_BUFFS=['strength','dexterity','plating','ritual','artifact','thorns','spineWard','flame','rage','colossus'];
-const ED122_DEBUFFS=['weak','vulnerable','frail','tangled','shrink'];
+const ED122_DEBUFFS=['weak','vulnerable','frail','tangled','shrink','tempStrengthDown'];
 const ED122_BOSS_SIGNS={
  ashen_monarch:{label:'ROYAL DECREE',sigil:'♛',theme:'crown'},
  rootmaw:{label:'ENTANGLING ROOTS',sigil:'❧',theme:'root'},

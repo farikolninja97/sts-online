@@ -16,13 +16,13 @@ endTurn=async function(){
    S.discard.push(c);
   }
   if(checkEndBattle())return;
-  // Player-duration debuffs tick before end-turn curses add their new stacks.
-  decayStatus(S);S.tangled=Math.max(0,(S.tangled||0)-1);
+  // Tangled lasts through the owner's whole turn, then disappears completely.
+  S.tangled=0;
   if(S.plating>0)gainBlock(S.plating,'effect');
   flushHandV105();
   if(S.tempStrength){S.strength-=S.tempStrength;S.tempStrength=0}
   S.rage=0;S.oneTwo=0;
-  for(const e of S.enemies){if(e.tempStrengthDown){e.strength+=e.tempStrengthDown;e.tempStrengthDown=0}}
+  // Enemy temporary Strength loss (Mangle) must remain through the next enemy action.
   if(checkEndBattle())return;
   // V1.19: freeze the player's actions and defenses before enemy attacks can
   // alter Block or card counters; intent and execution share this snapshot.
@@ -62,7 +62,7 @@ endTurn=async function(){
     if(m.block)e.block+=m.block;if(m.ritual)e.ritual+=m.ritual;
    }
    if(kind==='debuff'){
-    if(m.shrink)applyShrink(S);
+    if(m.shrink)applyShrink(S,{source:e});
     if(m.weak)blockDebuff(S,'weak',m.weak);
     if(m.frail)blockDebuff(S,'frail',m.frail);
     if(m.vulnerable)blockDebuff(S,'vulnerable',m.vulnerable);
@@ -73,13 +73,17 @@ endTurn=async function(){
    if(e.ritual>0&&e.step>0)e.strength+=e.ritual;
    e.step++;if(e.stunned)e.stunned=false;
    if(e.nextStun){e.stunned=true;e.nextStun=false}
-   decayStatus(e,['weak','vulnerable']);
+   decayStatus(e,['weak','vulnerable','frail']);
+   if(typeof ed123EndEnemyAction==='function')ed123EndEnemyAction(e);
    if(checkEndBattle())break;
    render();triggerFX();await sleep(105);
   }
   if(S.screen!=='battle')return;
+  if(typeof ed123EndEnemyPhase==='function')ed123EndEnemyPhase();
   const completedTurn=S.enemyResponse?{...S.enemyResponse}:null;
   S.turn++;S.turnPhase='player';
+  // Plating grants Block at end of player turn and loses one stack at next turn start.
+  if(S.plating>0)S.plating--;
   if(typeof ed120PlanAll==='function')ed120PlanAll(completedTurn);
   S.enemyResponse=null;
   S.energy=3;S.energyLocked=false;S.canDraw=true;S.cardsPlayed=0;S.attacksPlayed=0;S.flame=0;
@@ -95,7 +99,7 @@ endTurn=async function(){
   if(S.powers?.aggression){for(let i=0;i<S.powers.aggression;i++){
    let cards=S.discard.filter(c=>spec(c).type==='Attack');if(cards.length&&S.hand.length<10){let c=choice(cards);S.discard.splice(S.discard.indexOf(c),1);if(UP[c.key])c.up=true;S.hand.push(c)}
   }}
-  for(let e of S.enemies){if(e.tempStrengthDown){e.strength+=e.tempStrengthDown;e.tempStrengthDown=0}}
+  // Mangle is refunded at the end of the affected enemy's own action.
   S.colossus=0;
   drawCards(5,true);log('Your turn');
  }finally{enemyCinematics.cleanup();busy=false;save();render();triggerFX()}
@@ -111,7 +115,7 @@ adjustedEnemyDamage=function(e,m){
  if(m.kind!=='attack')return 0;
  let base=S.asc9&&m.ascDmg!=null?m.ascDmg:(m.dmg||0);
  if(S.asc9&&m.ascDmg==null){const over={mite:{Chomp:8,Stomp:14},marauder:{Crush:8},axe:{'Guarded Swing':6,'Overhead Smash':13},vine:{'Vine Swipe':7,Grasp:9,Gorge:18},archer:{'Piercing Bolt':16},acolyte:{'Dark Strike':11},whelp:{Bite:8},silk:{Thrash:5},stone:{Headbutt:16}};base=over[e.key]?.[m.n]??base}
- const multiplier=(e.weak>0?.75:1)*(S.vulnerable>0?1.5:1)*(S.colossus&&e.vulnerable>0?.5:1);
+ const multiplier=(e.weak>0?.75:1)*(e.shrink?.7:1)*(S.vulnerable>0?1.5:1)*(S.colossus&&e.vulnerable>0?.5:1);
  return Math.max(0,Math.floor(Math.max(0,base+(e.strength||0))*multiplier));
 };
 addVuln=function(e,n){if(!e||e.hp<=0)return;if(blockDebuff(e,'vulnerable',n)&&S.powers?.vicious)drawCards(S.powers.vicious)};

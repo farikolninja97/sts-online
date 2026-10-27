@@ -7,6 +7,7 @@ const ED_POTIONS = Object.freeze({
  swift:{name:'Swift Potion',icon:'🌪️',rarity:'Common',desc:'Draw 3 cards.',use:()=>drawCards(3,true)},
  strength:{name:'Strength Potion',icon:'💪',rarity:'Common',desc:'Gain 2 Strength.',use:()=>{S.strength+=2}},
  dexterity:{name:'Dexterity Potion',icon:'🔷',rarity:'Common',desc:'Gain 2 Dexterity.',use:()=>{S.dexterity=(S.dexterity||0)+2}},
+ beetle_juice:{name:'Beetle Juice',icon:'🪲',rarity:'Rare',target:true,desc:'Apply 4 turns of Shrink to an enemy. Its Attacks deal 30% less damage.',use:(e)=>applyShrink(e,{duration:4})},
  weak:{name:'Weak Potion',icon:'🕸️',rarity:'Common',target:true,desc:'Apply 3 Weak to an enemy.',use:(e)=>blockDebuff(e,'weak',3)},
  vulnerable:{name:'Vulnerable Potion',icon:'🩸',rarity:'Common',target:true,desc:'Apply 3 Vulnerable to an enemy.',use:(e)=>blockDebuff(e,'vulnerable',3)},
  blood:{name:'Blood Potion',icon:'🍷',rarity:'Common',desc:'Heal 20% of Max HP.',use:()=>{S.hp=Math.min(S.maxHP,S.hp+Math.floor(S.maxHP*.2))}},
