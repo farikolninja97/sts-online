@@ -19,7 +19,10 @@ Object.assign(CARDS,COMBAT_ONLY_CARDS);
 const v105LegacyStartBattle=startBattle;
 startBattle=function(kind){v105LegacyStartBattle(kind);S.artifact=0;S.turnPhase='player';S.combatEvents=[];S.weakThisTurn=0;S.vulnerableThisTurn=0;S.frailThisTurn=0;};
 function combatEvent(event,details={}){S.combatEvents??=[];S.combatEvents.push({event,turn:S.turn,...details});if(S.combatEvents.length>100)S.combatEvents.splice(0,40)}
-function blockDebuff(target,key,amount){if(amount<=0)return 0;let artifact=target.artifact||0;if(artifact>0){target.artifact--;log('Artifact negated '+key);combatEvent('artifact-negated',{key});return 0}target[key]=(target[key]||0)+amount;return amount}
+function combatantRef(target){return target===S?'hero':target?.id}
+function queueStatusFX(target,key,amount=1,extra={}){let id=combatantRef(target);if(id==null||typeof queueFX!=='function')return;let visual=typeof vfxCapture==='function'?vfxCapture(id):null;queueFX(id,amount,'status',{status:key,label:extra.label||String(key||'status').toUpperCase(),visual})}
+function applyShrink(target){if(!target)return 0;let artifact=target.artifact||0;if(artifact>0){target.artifact--;log('Artifact negated shrink');combatEvent('artifact-negated',{key:'shrink'});queueStatusFX(target,'artifact',1,{label:'ARTIFACT'});return 0}target.shrink=true;combatEvent('debuff-applied',{key:'shrink'});queueStatusFX(target,'shrink',1,{label:'SHRINK'});return 1}
+function blockDebuff(target,key,amount){if(amount<=0)return 0;let artifact=target.artifact||0;if(artifact>0){target.artifact--;log('Artifact negated '+key);combatEvent('artifact-negated',{key});queueStatusFX(target,'artifact',1,{label:'ARTIFACT'});return 0}target[key]=(target[key]||0)+amount;combatEvent('debuff-applied',{key,amount});queueStatusFX(target,key,amount,{label:String(key).toUpperCase()});return amount}
 function receiveDamage(amount,{attack=false,source=null,blockable=attack}={}){
  let value=Math.max(0,Math.floor(amount));
  // Colossus is already represented in the attack preview and incoming damage calculation.

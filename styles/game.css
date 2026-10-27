@@ -345,3 +345,45 @@ body.enemy-impact-frame .arena{filter:brightness(1.12) contrast(1.06)}
 @keyframes enemy-cast-pulse{0%{opacity:0;scale:.35}30%{opacity:1;scale:1}100%{opacity:0;scale:1.6}}
 @media(max-width:600px){.enemy-cinematic-caption{top:58px;max-width:69%;padding:5px 8px}.enemy-cinematic-caption strong{font-size:9px}.enemy-cinematic-caption span{font-size:11px}.enemy-charge-ring{width:68px;height:68px}.enemy-cast-orb{width:50px;height:50px}}
 @media(prefers-reduced-motion:reduce){.enemy-charge-ring,.enemy-cast-orb,.enemy-cinematic-caption{animation:none!important}.enemy-cinematic-ghost,.enemy-cinematic-bolt{display:none!important}body.enemy-impact-frame .arena{filter:none!important}}
+
+
+/* V1.21 — visible debuff states and application feedback */
+.avatar-shell{display:flex;align-items:flex-end;justify-content:center;transform-origin:50% 85%;transition:transform .32s ease,filter .24s ease,opacity .2s ease}
+.combatant.is-shrunk .avatar-shell{transform:scale(.78) translateY(10px)}
+.combatant.is-weak .avatar{filter:saturate(.72) brightness(.93)}
+.combatant.is-vulnerable .avatar-shell{filter:drop-shadow(0 0 14px #c65d5db5)}
+.combatant.is-frail .combat-vitals{filter:saturate(.78) brightness(.95)}
+.combatant.status-hit{z-index:6}
+.combatant.status-hit.status-weak .avatar{filter:saturate(.55) brightness(.82) drop-shadow(0 0 12px #8370c5aa)}
+.combatant.status-hit.status-vulnerable .avatar-shell{filter:drop-shadow(0 0 20px #ff7d7da8)}
+.combatant.status-hit.status-frail .combat-vitals{filter:brightness(1.2) drop-shadow(0 0 12px #d7c8ffa1)}
+.combatant.status-hit.status-shrink .avatar-shell{filter:drop-shadow(0 0 18px #9adfffc2)}
+.combat-status.status-chip-pop{animation:status-chip-pop .68s ease-out both;box-shadow:0 0 0 1px #fff5,0 0 18px #ffd79a88,0 3px 8px #0008}
+.vfx-status-tag,.vfx-status-burst{position:fixed;pointer-events:none;user-select:none;-webkit-user-select:none;transform:translate(-50%,-50%)}
+.vfx-status-tag{z-index:8;display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1px solid #f0d3a2;background:linear-gradient(180deg,#231f29f2,#111923f0);box-shadow:0 8px 22px #000b;font:900 clamp(12px,2.2vw,18px)/1 system-ui,sans-serif;letter-spacing:.08em;color:#fff0d0;text-shadow:0 1px 2px #000;white-space:nowrap;animation:vfx-status-tag-rise .88s ease-out both}
+.vfx-status-tag b{font:inherit;color:#fff}
+.vfx-status-tag.weak{border-color:#9b8dea;color:#ece8ff}
+.vfx-status-tag.vulnerable{border-color:#ef8888;color:#ffe2dc}
+.vfx-status-tag.frail{border-color:#c4b7ee;color:#f3ecff}
+.vfx-status-tag.shrink{border-color:#8dd6ea;color:#e0fbff}
+.vfx-status-tag.artifact{border-color:#ead68c;color:#fff4c9}
+.vfx-status-burst{z-index:6;width:112px;height:112px;border-radius:50%;animation:vfx-status-burst .64s ease-out both;box-shadow:0 0 22px transparent}
+.vfx-status-burst:before,.vfx-status-burst:after{content:'';position:absolute;inset:0;border-radius:50%}
+.vfx-status-burst.weak:before{border:4px solid #8d7eff;background:radial-gradient(circle,#7f72c145 0,transparent 68%);box-shadow:0 0 20px #7f72c177}
+.vfx-status-burst.vulnerable:before{border:4px solid #ea7272;background:radial-gradient(circle,#d85d5d50 0,transparent 68%);box-shadow:0 0 22px #ef676788}
+.vfx-status-burst.frail:before{border:4px solid #cabcf3;background:radial-gradient(circle,#b49ff346 0,transparent 68%);box-shadow:0 0 20px #b79ef377}
+.vfx-status-burst.shrink:before{border:4px solid #8fe3f6;background:radial-gradient(circle,#8fe3f650 0,transparent 68%);box-shadow:0 0 23px #8fe3f699}
+.vfx-status-burst.artifact:before{border:4px solid #f0d177;background:radial-gradient(circle,#ead78b54 0,transparent 68%);box-shadow:0 0 24px #f0d17799}
+.vfx-status-burst.shrink:after{inset:24%;border:3px dashed #d7ffff;animation:vfx-shrink-swirl .55s ease-out both}
+@keyframes status-chip-pop{0%{transform:scale(.82);opacity:.45}35%{transform:scale(1.18)}100%{transform:scale(1);opacity:1}}
+@keyframes vfx-status-tag-rise{0%{opacity:0;translate:0 12px;scale:.7}25%{opacity:1;translate:0 -4px;scale:1.05}100%{opacity:0;translate:0 -48px;scale:.96}}
+@keyframes vfx-status-burst{0%{opacity:0;scale:.25}30%{opacity:1;scale:1}100%{opacity:0;scale:1.65}}
+@keyframes vfx-shrink-swirl{0%{opacity:0;scale:1.25;rotate:0deg}35%{opacity:1}100%{opacity:0;scale:.4;rotate:145deg}}
+@media(max-width:600px){
+ .combatant.is-shrunk .avatar-shell{transform:scale(.82) translateY(7px)}
+ .vfx-status-burst{width:82px;height:82px}
+ .vfx-status-tag{padding:6px 10px;font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+ .combat-status.status-chip-pop,.vfx-status-tag,.vfx-status-burst{animation-duration:.12s!important}
+}

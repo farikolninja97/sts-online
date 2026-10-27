@@ -62,7 +62,7 @@ endTurn=async function(){
     if(m.block)e.block+=m.block;if(m.ritual)e.ritual+=m.ritual;
    }
    if(kind==='debuff'){
-    if(m.shrink)S.shrink=true;
+    if(m.shrink)applyShrink(S);
     if(m.weak)blockDebuff(S,'weak',m.weak);
     if(m.frail)blockDebuff(S,'frail',m.frail);
     if(m.vulnerable)blockDebuff(S,'vulnerable',m.vulnerable);
