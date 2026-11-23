@@ -1,0 +1,19 @@
+/* V1.28 — readable enemy signatures, themed spell/impact colors. */
+.ed128-intent-detail{display:block;flex:0 0 100%;font:700 9px/1.22 system-ui,sans-serif;color:#f7d1b0;letter-spacing:.01em;margin-top:1px;max-width:100%;overflow-wrap:anywhere}
+body[data-ed128-archetype="ember"] .enemy-charge-ring,
+body[data-ed128-archetype="ember"] .enemy-cast-orb{filter:hue-rotate(-24deg) saturate(1.7);box-shadow:0 0 24px #ff913f}
+body[data-ed128-archetype="thorn"] .enemy-charge-ring,
+body[data-ed128-archetype="thorn"] .enemy-cast-orb{filter:hue-rotate(85deg) saturate(1.3);box-shadow:0 0 24px #9ac878}
+body[data-ed128-archetype="crystal"] .enemy-charge-ring,
+body[data-ed128-archetype="crystal"] .enemy-cast-orb{filter:hue-rotate(165deg) saturate(1.6);box-shadow:0 0 24px #a7e8fa}
+body[data-ed128-archetype="arcane"] .enemy-charge-ring,
+body[data-ed128-archetype="arcane"] .enemy-cast-orb{filter:hue-rotate(240deg) saturate(1.55);box-shadow:0 0 25px #cba2ff}
+body[data-ed128-archetype="fang"] .enemy-charge-ring{filter:hue-rotate(-60deg);box-shadow:0 0 19px #f8a875}
+body[data-ed128-archetype="projectile"] .enemy-cinematic-bolt{box-shadow:0 0 22px #b9e5c4}
+body[data-ed128-archetype="heavy"] .enemy-charge-ring{box-shadow:0 0 25px #f3d6a3}
+@media(max-width:600px){.ed128-intent-detail{font-size:8px;line-height:1.15}}
+.ed128-intel-guide{margin:15px 0;padding:12px;border:1px solid #92735a;border-radius:10px;background:#15252e}
+.ed128-intel-guide h3{margin:0 0 6px;color:#f4d4a3}
+.ed128-intel-foe{font:12px/1.5 system-ui,sans-serif;margin:8px 0;color:#eee0cf}
+.ed128-intel-foe ul{padding-left:19px;margin:5px 0}
+.ed128-intel-foe li{margin:4px 0}

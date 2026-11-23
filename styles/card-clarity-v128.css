@@ -1,0 +1,18 @@
+/* V1.28: Card description never intersects rarity. Top rarity badge is authoritative. */
+.ed126-card{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;padding-bottom:5px}
+.ed126-card>.rarity{display:none!important}
+.ed126-card>.ed126-card-banner{flex:0 0 auto}
+.ed126-card>.card-title{flex:0 0 auto;max-height:2.4em;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-height:1.16;min-height:0!important;margin-bottom:3px}
+.ed126-card>.art{flex:1 1 auto;min-height:45px;height:auto!important;margin:2px 5px 1px;overflow:hidden}
+.ed126-card>.ed126-card-tags{flex:0 0 auto;justify-content:center;min-height:0;margin:3px 3px 1px}
+.ed126-card>.card-type{flex:0 0 auto;margin:2px 0 1px;line-height:1.1}
+.ed126-card>.card-desc{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;max-height:3.55em;min-height:0!important;flex:0 1 auto;margin:2px 6px 3px!important;line-height:1.18!important;font-size:clamp(9px,.83vw,11px)!important;overflow-wrap:anywhere}
+.ed126-card.mini>.art{min-height:42px}
+.ed126-card.mini>.card-desc{font-size:9px!important;-webkit-line-clamp:2;max-height:2.45em}
+/* Small combat hands deliberately show artwork and name; inspect for full rules. */
+@media(max-width:600px){
+ body.oncombat .hand-area .hand-wrap .ed126-card>.art{min-height:42px;height:auto!important;flex:1 1 auto}
+ body.oncombat .hand-area .hand-wrap .ed126-card>.card-desc{display:none!important}
+ body.oncombat .hand-area .hand-wrap .ed126-card>.card-title{display:block;-webkit-line-clamp:unset;line-height:14px!important}
+}
+@media(min-width:601px) and (max-width:1050px){.ed126-card>.card-desc{-webkit-line-clamp:2;max-height:2.4em}}

@@ -39,6 +39,8 @@ endTurn=async function(){
     for(let i=0;i<(m.hits||1);i++){
      if(e.hp<=0||S.hp<=0||S.screen!=='battle')break;
      await enemyCinematics.hit(e,m,i,m.hits||1,()=>{
+      // Shatter a telegraphed amount of Block immediately before the first hit.
+      if(i===0&&m.shatterBlock>0){const removed=Math.min(S.block,m.shatterBlock);S.block-=removed;if(removed){log(`${e.name} breaks ${removed} Block`);combatEvent('block-shattered',{enemy:e.key,removed});queueStatusFX(S,'shatter',removed,{label:'GUARD BREAK'});}}
       const predicted=adjustedEnemyDamage(e,m);
       const impact=receiveDamage(predicted,{attack:true,source:e});
       log(`${e.name} attacks for ${predicted} (${impact.blocked} blocked)`);
@@ -61,14 +63,17 @@ endTurn=async function(){
     if(m.strength){let amount=e.key==='feeder'&&S.asc9?16:m.strength;e.strength+=amount;queueFX(e.id,amount,'buff')}
     if(m.block)e.block+=m.block;if(m.ritual)e.ritual+=m.ritual;
    }
-   if(kind==='debuff'){
-    if(m.shrink)applyShrink(S,{source:e});
+   // Debuffs on attack moves land AFTER the telegraphed hit, exactly once.
+   // Do not treat every enemy's attack as Shrink; only the beetle owns that effect.
+   if(kind==='attack'||kind==='debuff'){
+    if(m.shrink){applyShrink(S,{source:e});e.usedShrink=true;}
     if(m.weak)blockDebuff(S,'weak',m.weak);
     if(m.frail)blockDebuff(S,'frail',m.frail);
     if(m.vulnerable)blockDebuff(S,'vulnerable',m.vulnerable);
    }
    if(m.status&&COMBAT_ONLY_CARDS[m.status])for(let i=0;i<(m.statusCount||1);i++)placeCombatCard(m.status,'discard');
    if(typeof ed118ResolveEnemyMove==='function')ed118ResolveEnemyMove(e,m);
+   if(typeof ed128ResolveEnemyMove==='function')ed128ResolveEnemyMove(e,m);
    if(typeof ed119ResolveEnemyMove==='function')ed119ResolveEnemyMove(e,m);
    if(e.ritual>0&&e.step>0)e.strength+=e.ritual;
    e.step++;if(e.stunned)e.stunned=false;
