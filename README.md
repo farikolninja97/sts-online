@@ -1,50 +1,48 @@
-# Ember Descent — V1.24 Events & Treasures
+# Ember Descent V1.25 — Run Chronicle Milestone
 
-**Full GitHub Pages release** built on **V1.23 Accurate Statuses**. The existing save key, `ember_descent_sts2_100`, has **not changed**.
+**Full GitHub Pages update** based on V1.24 Events & Treasures. Ironclad-only original browser roguelike. No server, Supabase, or SQL migration.
 
-## Features
+## Milestone delivered: persistent Run Chronicle
 
-### Nine original events (three decisions apiece)
-- Cinder Altar — blood for Gold, random upgrade, or leave
-- Fractured Mirror — copy a chosen card for HP or remove one for Gold
-- Abandoned Armory — a risky relic or a selected Attack upgrade
-- Lantern Stall — free potion, paid Rare card, or leave
-- Withered Grove — pay for healing or accept healing and a Curse
-- Shattered Vault — coins for HP or a relic for Gold
-- Runic Workshop — selected card upgrade or Curse removal/healing
-- Forgotten Archive — Rare card and Curse, or paid card removal
-- Silent Shrine — Max HP upgrade for Gold or a relic for Max HP
+A finished run now creates a historical record **separate from the live-game save**, including:
 
-Each encounter persists through a reload, keeps track of recent room types so consecutive duplicates are avoided, checks prerequisites before making a choice, and records a single committed result. This is **original Ember Descent event content**, not an official Slay the Spire 2 event catalog.
+- Victory/defeat, act, floor, floors cleared, battles won, difficulty, and elapsed time
+- Final deck with card upgrades and Curses
+- Relics, remaining potions, Ancient choice history, and event/treasure journal
+- Gold, HP, damage dealt/taken/blocked, turns ended, and cards played (precise combat telemetry starts with new V1.25 runs; migrated runs are marked partial)
+- Run summary after victory or defeat and a detailed record viewer
+- Last 100 completed runs, win rate, highest climb, and total battles/floors from retained runs
+- 12 original achievement badges (display/progression only; **no official STS2 card unlocks**)
 
-### Claimable treasure rooms
-When entering a **new** treasure room you now select exactly one of:
-- An unowned relic
-- 75 Gold
-- A random potion plus 30 Gold (if you have an open potion slot)
+The Chronicle is accessible from the **start screen** and the **Game Menu**. Live progress appears under **Menu → Current Run**. The end screen offers **View Run Chronicle** and **Start another run**. Duplicate recording is prevented on reload and repeated rendering.
 
-Rewards are never automatically granted before making a choice. A saved V1.23 treasure screen is treated as **already rewarded**, so it cannot pay out a second time.
+## Install
 
-### Run Journal
-Open **Menu → View Run Journal** to review your past event decisions and treasure claims in the current run.
+1. Extract the release ZIP.
+2. Open the `github-pages/` folder in the ZIP.
+3. Upload everything **inside** `github-pages/` into the root of `farikolninja97/sts-online` on your Pages branch, keeping `src/` and `styles/` subdirectories.
+4. Wait for your GitHub Pages deployment, then check that the footer says **V1.25**. Use Chrome Incognito to bypass older cached JavaScript without wiping local site storage.
 
-## Install on GitHub Pages
+**Save compatibility:** The live save key remains `ember_descent_sts2_100`. The new Chronicle has a **separate localStorage key** (`ember_descent_run_chronicle_v1`). Old in-progress V1.24 saves are migrated without deleting their existing cards, relics, or journal. Only combat statistics accumulated after upgrading to V1.25 are counted for an old run.
 
-1. Extract this ZIP.
-2. Open its `github-pages/` folder.
-3. Copy **all files and directories from within `github-pages/`** to your `farikolninja97/sts-online` repository root on `main`, replacing matching files.
-4. Keep `src/` and `styles/` directory structures intact.
-5. After GitHub Pages deploys, open the site and confirm **V1.24** in the footer. If Chrome still shows an older release, check Incognito or clear cached files (not site storage).
+**Storage warning:** Chronicle data stays **only in that browser/site storage**, not in GitHub or cloud storage. Chrome and Safari have independent histories. Clearing site data or using private/incognito browsing can erase or discard the history. The in-game **Clear Chronicle** control requires confirmation and does not erase your live run.
 
-**No Supabase setup or SQL migration.** This is a static-site release and does not change the existing local save key.
+## What's unchanged
 
-## Files added
-- `src/systems/events/events-v124.js` — event rules, claimable treasure rules, safe save/reload, journal
-- `styles/events-v124.css` — event screen, treasure screen and journal UI
+- 52 enemy designs and 72 formations, original bosses and special AI
+- Ironclad card catalog, card upgrades, relics and potions
+- V1.23 Shrink and status-duration mechanics
+- V1.24 events, treasure, run journal, and map
+- Existing local save key and gameplay balance
 
-## Files modified
-- `src/core/config.js` — version V1.24
-- `index.html` — load V1.24 script and stylesheet
+This is an original fan prototype, not a verified 1:1 recreation of Slay the Spire 2. Run Chronicle achievements are original to this game.
 
-## QA
-See `QA_REPORT_V1.24.md` for executed tests and limits. Chromium tests ran from an **inline test bundle with simulated localStorage** because direct local HTTP/file navigation is blocked in this test environment. Live GitHub Pages and physical Safari must be verified after deployment. The entire official STS2 content catalog is not recreated in this prototype.
+## Source changes
+
+- `src/core/config.js` — visible version V1.25
+- `src/systems/game/run-chronicle-v125.js` — run telemetry, outcome archiving, permanent history, badges, UI
+- `styles/chronicle-v125.css` — responsive Chronicle, progress, and victory/defeat presentation
+- `index.html` — load the new script and style last
+- `github-pages/README.md` — install notes
+
+See `QA_REPORT_V1.25.md` and `V1.25_PRIORITY_CHECKLIST.md` for verification scope and remaining priorities.
