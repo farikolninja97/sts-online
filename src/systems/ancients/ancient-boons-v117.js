@@ -47,15 +47,15 @@ function ancientV117Start(act){
  let who,offers;
  if(act===1){
   who=ANCIENT_V117_IDENTITIES[1];
-  const cursed=choice(['neow_cursed','neow_large']);
+  const cursed=choice(['neow_cursed','neow_large'],'ancient');
   const positives=Object.keys(ANCIENT_V117).filter(x=>x.startsWith('neow_')&&!ANCIENT_V117[x].risk &&
      // The cursed gold offer is not paired with Golden Pearl.
      !(cursed==='neow_cursed'&&x==='neow_gold')&&
      // Large Capsule isn't offered alongside Small Capsule.
      !(cursed==='neow_large'&&x==='neow_small'));
-  offers=[...shuffle(positives).slice(0,2),cursed];
+  offers=[...shuffle(positives,'ancient').slice(0,2),cursed];
  }else{
-  who=choice(ANCIENT_V117_IDENTITIES[act]);offers=[...who.offers];
+  who=choice(ANCIENT_V117_IDENTITIES[act],'ancient');offers=[...who.offers];
  }
  const missing=Math.max(0,S.maxHP-S.hp);
  // STS2 Ascension 2+ heals 80% of missing health; this prototype exposes A9+.
@@ -65,7 +65,7 @@ function ancientV117Start(act){
  S.ancientHistory??=[];S.screen='ancient';modal=null;save();return true;
 }
 function ancientV117Eligible(){return S.deck.filter(c=>!c.up&&UP[c.key]);}
-function ancientV117Upgrade(n=1,predicate=()=>true){let options=shuffle(ancientV117Eligible().filter(predicate));let selected=options.slice(0,n);for(let c of selected)c.up=true;return selected.length;}
+function ancientV117Upgrade(n=1,predicate=()=>true){let options=shuffle(ancientV117Eligible().filter(predicate),'ancient');let selected=options.slice(0,n);for(let c of selected)c.up=true;return selected.length;}
 function ancientV117Boon(id){return !!S?.relics?.includes('anc_'+id)};
 function ancientV117Apply(id){
  // Invoked exclusively by a confirmed offer. Never on render or load.
@@ -76,7 +76,7 @@ function ancientV117Apply(id){
  case 'neow_oyster':S.maxHP+=11;S.hp+=11;break;
  case 'neow_rare':{
    let rare=SOLO_POOL.filter(k=>CARDS[k]?.rarity==='Rare');
-   if(rare.length)S.deck.push(newCard(choice(rare)));break;
+   if(rare.length)S.deck.push(newCard(choice(rare,'ancient')));break;
  }
  case 'neow_small':randomRelic();break;
  case 'neow_talisman':

@@ -5,9 +5,9 @@ function adjustedEnemyDamage(e,m){if(m.kind!=='attack')return 0;let value=legacy
 function gainBlock(amount){let n=Math.max(0,Math.floor((amount+(S.dexterity||0))*(S.frail>0?.75:1)));if(S.powers?.unmovable&&!S.blockGainedFromCard){n*=2;S.blockGainedFromCard=true}S.block+=n;if(n>0&&S.powers?.juggernaut)for(let i=0;i<S.powers.juggernaut;i++)dealRawToRandom(S.juggernautDamage||6);log(`Gained ${n} Block`);return n}
 function exhaustCard(c){S.exhaust.push(c);S.exhaustedThisTurn=(S.exhaustedThisTurn||0)+1;if(S.powers?.feel)gainBlock(S.powers.feel);if(S.powers?.darkembrace)drawCards(S.powers.darkembrace);if(c.key==='drum')S.energy+=c.up?3:2}
 function personalLoss(n){S.hp=Math.max(0,S.hp-n);S.turnHpLoss=(S.turnHpLoss||0)+n;S.lossCount=(S.lossCount||0)+1;log(`Lost ${n} HP`);if(S.powers?.rupture)S.strength+=S.powers.rupture;if(S.powers?.inferno)for(let e of alive())hurtEnemy(e,S.infernoDamage||6,false)}
-function drawCards(n,force=false){if(!S.canDraw&&!force){log('Cannot draw more cards this turn');return}for(let i=0;i<n;i++){if(S.hand.length>=10)break;if(!S.draw.length){if(!S.discard.length)break;S.draw=shuffle(S.discard.splice(0))}let c=S.draw.shift();if(S.powers?.hellraiser&&CARDS[c.key].name.includes('Strike')&&!S._drawingStrike){S._drawingStrike=true;let foe=choice(alive());if(foe)attack(foe,spec(c).dmg||6);S.discard.push(c);S._drawingStrike=false}else S.hand.push(c)}}
+function drawCards(n,force=false){if(!S.canDraw&&!force){log('Cannot draw more cards this turn');return}for(let i=0;i<n;i++){if(S.hand.length>=10)break;if(!S.draw.length){if(!S.discard.length)break;S.draw=shuffle(S.discard.splice(0),'combat')}let c=S.draw.shift();if(S.powers?.hellraiser&&CARDS[c.key].name.includes('Strike')&&!S._drawingStrike){S._drawingStrike=true;let foe=choice(alive(),'combat');if(foe)attack(foe,spec(c).dmg||6);S.discard.push(c);S._drawingStrike=false}else S.hand.push(c)}}
 function startBattle(type){legacyStartBattle(type);S.exhaustedThisTurn=0;S.turnHpLoss=0;S.lossCount=0;S.tempStrength=0;S.plating=0;S.dexterity=0;S.colossus=0;S.oneTwo=0;S.nextAttackFree=false;S.blockGainedFromCard=false}
-function checkEndBattle(){if(S.hp<=0){S.screen='death';busy=false;return true}if(alive().length===0){S.defeated=S.enemies.map(x=>x.name).join(', ');S.clearCount++;S.hp=Math.min(S.maxHP,S.hp+6);S.rewardGold=S.room==='Boss'?45:S.room==='Elite'?32:17; /* Deferred until explicitly claimed. */let commons=SOLO_POOL.filter(k=>CARDS[k].rarity!=='Rare'),rares=SOLO_POOL.filter(k=>CARDS[k].rarity==='Rare');S.offered=[...shuffle(commons).slice(0,2),choice(rares)].map(newCard);S.screen='reward';busy=false;return true}return false}
+function checkEndBattle(){if(S.hp<=0){S.screen='death';busy=false;return true}if(alive().length===0){S.defeated=S.enemies.map(x=>x.name).join(', ');S.clearCount++;S.hp=Math.min(S.maxHP,S.hp+6);S.rewardGold=S.room==='Boss'?45:S.room==='Elite'?32:17; /* Deferred until explicitly claimed. */let commons=SOLO_POOL.filter(k=>CARDS[k].rarity!=='Rare'),rares=SOLO_POOL.filter(k=>CARDS[k].rarity==='Rare');S.offered=[...shuffle(commons,'reward').slice(0,2),choice(rares,'reward')].map(newCard);S.screen='reward';busy=false;return true}return false}
 function chooseReward(uid){let c=S.offered.find(x=>x.uid===uid);if(c&&S.screen==='reward'){S.deck.push(c);moveToNext()}}
 function shopScreen(){let cards=S.shopOffers||[];return `<main class="page screenpad"><section class="innerpanel"><div class="small">Merchant's lantern · Act ${S.act} · Floor ${S.floor}</div><h1 class="sectiontitle">The Lantern Merchant</h1><p class="subhead">Gold: <b>✦ ${S.gold}</b>. Select cards or healing.</p><div class="shopgrid">${cards.map((key,i)=>`<div class="shoprow"><div><b>${escapeHTML(CARDS[key].name)}</b><div class="note">${escapeHTML(CARDS[key].desc)}</div></div><button class="btn dark" data-buy="${i}" ${S.gold<55?'disabled':''}>55 ✦</button></div>`).join('')}<div class="shoprow"><div><b>Camp provisions</b><p class="note">Heal 18 HP.</p></div><button class="btn dark" data-action="buyheal" ${S.gold<40||S.hp===S.maxHP?'disabled':''}>40 ✦</button></div></div><button class="btn" data-action="leave">Leave merchant →</button></section></main>`}
 function addVuln(e,n){if(!e||e.hp<=0)return;e.vulnerable+=n;if(S.powers?.vicious)drawCards(S.powers.vicious)}
@@ -37,10 +37,10 @@ function applyCard(c,opt={}){vfxActiveCard=c.key;if(S.screen!=='battle')return;l
  if(c.key==='bloodlet')personalLoss(3);
  if(c.key==='breakthrough'||c.key==='brand')personalLoss(1);
  if(c.key==='offering')personalLoss(6);
- const useAttack=()=>{if(d.type!=='Attack')return;if(randomHits){for(let i=0;i<randomHits;i++){let t=choice(alive());if(t)killed=attack(t,base)||killed}}else if(aoe){for(let i=0;i<hits;i++)for(let t of [...alive()])killed=attack(t,base)||killed}else if(hits>0)killed=attack(enemy,base,hits)};
+ const useAttack=()=>{if(d.type!=='Attack')return;if(randomHits){for(let i=0;i<randomHits;i++){let t=choice(alive(),'combat');if(t)killed=attack(t,base)||killed}}else if(aoe){for(let i=0;i<hits;i++)for(let t of [...alive()])killed=attack(t,base)||killed}else if(hits>0)killed=attack(enemy,base,hits)};
  if(c.key==='ironwave')gainBlock(d.block||5);
  useAttack();
- if(c.key==='thrash'){let choices=S.hand.filter(x=>spec(x).type==='Attack');if(choices.length){let sacrificed=choice(choices);S.hand.splice(S.hand.indexOf(sacrificed),1);c.bonus=(c.bonus||0)+(spec(sacrificed).dmg||0);exhaustCard(sacrificed);showRandomExhaust(sacrificed,'Thrash')}}
+ if(c.key==='thrash'){let choices=S.hand.filter(x=>spec(x).type==='Attack');if(choices.length){let sacrificed=choice(choices,'combat');S.hand.splice(S.hand.indexOf(sacrificed),1);c.bonus=(c.bonus||0)+(spec(sacrificed).dmg||0);exhaustCard(sacrificed);showRandomExhaust(sacrificed,'Thrash')}}
   // The repeated play resolves after the original attack's on-hit effects.
  if(d.type==='Attack'&&S.rage){gainBlock(S.rage,'effect');log(`Rage: +${S.rage} Block`)}
  switch(c.key){
@@ -70,10 +70,10 @@ function applyCard(c,opt={}){vfxActiveCard=c.key;if(S.screen!=='battle')return;l
  case 'dominate':addVuln(enemy,c.up?2:1);S.strength+=enemy?.vulnerable||0;break;
  case 'notyet':S.hp=Math.min(S.maxHP,S.hp+(c.up?13:10));break;
  case 'onetwo':S.oneTwo+=c.up?2:1;break;
- case 'infernal':{let k=choice(SOLO_POOL.filter(x=>CARDS[x].type==='Attack'));if(k&&S.hand.length<10){let a=newCard(k);a.tempFree=true;S.hand.push(a)}break}
+ case 'infernal':{let k=choice(SOLO_POOL.filter(x=>CARDS[x].type==='Attack'),'combat');if(k&&S.hand.length<10){let a=newCard(k);a.tempFree=true;S.hand.push(a)}break}
  case 'armaments':if(c.up)S.hand.forEach(x=>{if(UP[x.key])x.up=true});else if(S.hand.some(x=>!x.up&&UP[x.key]))modal={type:'upgradehand'};break;
- case 'truegrit':if(S.hand.length){if(c.up)chooseExhaustFromHand();else {const removed=S.hand.splice(Math.floor(Math.random()*S.hand.length),1)[0];exhaustCard(removed);showRandomExhaust(removed,'True Grit')}}break;
- case 'cinder':if(S.hand.length){const removed=S.hand.splice(Math.floor(Math.random()*S.hand.length),1)[0];exhaustCard(removed);showRandomExhaust(removed,'Cinder')}break;
+ case 'truegrit':if(S.hand.length){if(c.up)chooseExhaustFromHand();else {const removed=S.hand.splice(Math.floor(ed127Roll('combat')*S.hand.length),1)[0];exhaustCard(removed);showRandomExhaust(removed,'True Grit')}}break;
+ case 'cinder':if(S.hand.length){const removed=S.hand.splice(Math.floor(ed127Roll('combat')*S.hand.length),1)[0];exhaustCard(removed);showRandomExhaust(removed,'Cinder')}break;
  case 'burningpact':{let n=c.up?3:2;if(S.hand.length){modal={type:'chooseExhaust',afterDraw:n}}else drawCards(n);break}
  case 'headbutt':if(S.discard.length)modal={type:'discardtop'};break;
  case 'havoc':{let next=popDraw();if(next)applyCard(next,{free:true,cost:0,forcedExhaust:true});break}
@@ -84,7 +84,7 @@ function applyCard(c,opt={}){vfxActiveCard=c.key;if(S.screen!=='battle')return;l
  case 'inflame':S.strength+=c.up?3:2;queueFX('hero',c.up?3:2,'buff');break;
  case 'anger':S.discard.push({...c,uid:'c'+(++uid)});break;
  case 'primal':S.hand=S.hand.map(x=>{if(spec(x).type!=='Attack')return x;let a=newCard('giantrock');a.up=!!c.up;return a});break;
- case 'stoke':{let count=S.hand.length;for(let cc of S.hand.splice(0))exhaustCard(cc);for(let i=0;i<count;i++)if(S.hand.length<10){let made=newCard(choice(SOLO_POOL));if(c.up)made.up=!!UP[made.key];S.hand.push(made)}break}
+ case 'stoke':{let count=S.hand.length;for(let cc of S.hand.splice(0))exhaustCard(cc);for(let i=0;i<count;i++)if(S.hand.length<10){let made=newCard(choice(SOLO_POOL,'combat'));if(c.up)made.up=!!UP[made.key];S.hand.push(made)}break}
  case 'fiend':if(killed)log('Fiend Fire struck the final blow');break;
  case 'feed':if(killed){let n=c.up?4:3;S.maxHP+=n;S.hp+=n;log(`Fatal: +${n} Max HP`)}break;
  }
@@ -95,7 +95,7 @@ function applyCard(c,opt={}){vfxActiveCard=c.key;if(S.screen!=='battle')return;l
  if(S.hp<=0){S.screen='death';busy=false}else if(!alive().length)checkEndBattle();
  if(S.screen==='battle'&&(!S.enemies[S.target]||S.enemies[S.target].hp<=0))S.target=S.enemies.findIndex(e=>e.hp>0)
 }
-function popDraw(){if(!S.draw.length&&S.discard.length)S.draw=shuffle(S.discard.splice(0));return S.draw.shift()}
+function popDraw(){if(!S.draw.length&&S.discard.length)S.draw=shuffle(S.discard.splice(0),'combat');return S.draw.shift()}
 function chooseExhaustFromHand(){if(S.hand.length)modal={type:'chooseExhaust'}}
 async function endTurn(){if(busy||S.screen!=='battle')return;
  // End-of-turn powers, preserving the original enemy AI and attack animation system.

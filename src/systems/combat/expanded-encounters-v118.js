@@ -66,7 +66,7 @@ function e118ChooseGroup(kind){
  const recent=S.encounterHistory.filter(x=>x.act===act&&x.kind===kind).slice(-3).map(x=>x.id);
  let options=formations.filter(f=>!recent.includes(f.enemies.join('+')));
  if(!options.length)options=formations;
- const selected=choice(options);
+ const selected=choice(options,'encounter');
  S.encounterHistory.push({act,kind,id:selected.enemies.join('+')});
  if(S.encounterHistory.length>30)S.encounterHistory=S.encounterHistory.slice(-30);
  return selected;

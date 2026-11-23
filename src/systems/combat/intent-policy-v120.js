@@ -157,7 +157,7 @@ moveFor=function(e){
 const ed120StartBattleBase=startBattle;
 startBattle=function(kind){
  ed120StartBattleBase(kind);
- S.aiSeed=(S.aiSeed>>>0)||((Math.random()*4294967295)>>>0)||0x9e3779b9;
+ S.aiSeed=(S.aiSeed>>>0)||((ed127Roll('ai')*4294967295)>>>0)||0x9e3779b9;
  if(S.screen==='battle')ed120PlanAll();
 };
 const ed120BattleBase=battleScreen;

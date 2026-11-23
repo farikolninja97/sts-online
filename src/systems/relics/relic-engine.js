@@ -2,14 +2,14 @@
 'use strict';
 function ensureRelics(){if(!S)return;S.relics=Array.isArray(S.relics)?S.relics:['burning_blood'];if(!S.relics.includes('burning_blood'))S.relics.unshift('burning_blood');S.relicCounters??={};S.relicCombat??={};}
 function ownsRelic(id){return !!S&&Array.isArray(S.relics)&&S.relics.includes(id)}
-function relicRoll(rarity){if(!S)return null;let options=RELIC_POOL.filter(id=>!ownsRelic(id)&&(!rarity||RELICS[id].rarity===rarity));if(!options.length)options=RELIC_POOL.filter(id=>!ownsRelic(id));return options.length?choice(options):null;}
+function relicRoll(rarity){if(!S)return null;let options=RELIC_POOL.filter(id=>!ownsRelic(id)&&(!rarity||RELICS[id].rarity===rarity));if(!options.length)options=RELIC_POOL.filter(id=>!ownsRelic(id));return options.length?choice(options,'relic'):null;}
 function relicHeal(n){let before=S.hp;S.hp=Math.min(S.maxHP,S.hp+n);return S.hp-before}
 function gainRelic(id){ensureRelics();if(!RELICS[id]||ownsRelic(id))return false;S.relics.push(id);S.lastRelicFound=id;log('Relic acquired: '+RELICS[id].name);
  if(id==='joss_paper')S.relicCounters.joss??=0;
  if(id==='nunchaku')S.relicCounters.nunchaku??=0;
  if(id==='strawberry'){S.maxHP+=7;S.hp+=7}
  if(id==='war_paint'||id==='whetstone'){
-  const type=id==='war_paint'?'Skill':'Attack';let eligible=shuffle(S.deck.filter(c=>!c.up&&UP[c.key]&&CARDS[c.key]?.type===type));
+  const type=id==='war_paint'?'Skill':'Attack';let eligible=shuffle(S.deck.filter(c=>!c.up&&UP[c.key]&&CARDS[c.key]?.type===type),'relic');
   S.relicUpgrades??={};S.relicUpgrades[id]=eligible.slice(0,2).map(c=>{c.up=true;return {key:c.key,uid:c.uid};});
  }
  save();return true;

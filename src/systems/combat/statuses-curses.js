@@ -65,12 +65,12 @@ drawCards=function(n,force=false){
  let count=0;
  for(let i=0;i<n;i++){
   if(S.hand.length>=10){log('Hand full (10 cards)');break}
-  if(!S.draw.length){if(!S.discard.length)break;S.draw=shuffle(S.discard.splice(0));combatEvent('reshuffle')}
+  if(!S.draw.length){if(!S.discard.length)break;S.draw=shuffle(S.discard.splice(0),'combat');combatEvent('reshuffle')}
   const c=S.draw.shift();if(!c)break;
   S.hand.push(c);count++;combatEvent('draw',{card:c.key});
   if(c.key==='void')S.energy=Math.max(0,S.energy-1);
   if(S.powers?.hellraiser&&CARDS[c.key]?.name.includes('Strike')&&autoPlayDepth<12&&alive().length){
-   let foe=choice(alive()),oldTarget=S.target;
+   let foe=choice(alive(),'combat'),oldTarget=S.target;
    S.target=S.enemies.indexOf(foe);S.hand.splice(S.hand.indexOf(c),1);
    autoPlayDepth++;
    try{applyCard(c,{free:true,cost:0})}finally{autoPlayDepth--;S.target=oldTarget}

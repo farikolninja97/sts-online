@@ -7,8 +7,8 @@ endTurn=async function(){
  try{
   if(S.powers?.stampede){for(let i=0;i<S.powers.stampede&&alive().length;i++){
    const attacks=S.hand.filter(c=>spec(c).type==='Attack');if(!attacks.length)break;
-   const c=choice(attacks),oldTarget=S.target;S.hand.splice(S.hand.indexOf(c),1);
-   S.target=S.enemies.indexOf(choice(alive()));applyCard(c,{free:true,cost:0});S.target=oldTarget;
+   const c=choice(attacks,'combat'),oldTarget=S.target;S.hand.splice(S.hand.indexOf(c),1);
+   S.target=S.enemies.indexOf(choice(alive(),'combat'));applyCard(c,{free:true,cost:0});S.target=oldTarget;
   }}
   for(let c of [...S.exhaust.filter(c=>c.key==='howl')]){
    S.exhaust.splice(S.exhaust.indexOf(c),1);
@@ -97,7 +97,7 @@ endTurn=async function(){
   if(S.powers?.inferno&&S.hp>0)personalLoss(S.powers.inferno);
   if(S.hp<=0){checkEndBattle();return}
   if(S.powers?.aggression){for(let i=0;i<S.powers.aggression;i++){
-   let cards=S.discard.filter(c=>spec(c).type==='Attack');if(cards.length&&S.hand.length<10){let c=choice(cards);S.discard.splice(S.discard.indexOf(c),1);if(UP[c.key])c.up=true;S.hand.push(c)}
+   let cards=S.discard.filter(c=>spec(c).type==='Attack');if(cards.length&&S.hand.length<10){let c=choice(cards,'combat');S.discard.splice(S.discard.indexOf(c),1);if(UP[c.key])c.up=true;S.hand.push(c)}
   }}
   // Mangle is refunded at the end of the affected enemy's own action.
   S.colossus=0;

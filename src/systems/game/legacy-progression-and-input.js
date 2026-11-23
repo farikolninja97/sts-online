@@ -4,17 +4,17 @@ function newGame(){uid=0;modal=null;S={screen:'route',act:1,floor:0,hp:80,maxHP:
 function moveToNext(){S.totalFloors=(S.totalFloors||0)+1;if(S.floor===9){if(S.act>=3){S.screen='victory'}else{S.act++;S.floor=0;S.screen='route';generateRoute()}}else{S.screen='route';generateRoute()}save();render()}
 function takeRoom(type){if(S.screen!=='route')return;S.floor++; S.room=type==='normal'?'Battle':type==='elite'?'Elite':type==='boss'?'Boss':type;S.shopOffers=null;
  if(['normal','elite','boss'].includes(type))startBattle(type);
- else if(type==='shop'){S.screen='shop';S.shopOffers=shuffle(POOL).slice(0,3)}
+ else if(type==='shop'){S.screen='shop';S.shopOffers=shuffle(POOL,'shop').slice(0,3)}
  else S.screen=type;
  save();render();}
 function makeEnemy(k,i){let d=ENEMIES[k],h=d.hp+(S.asc9?1:0);return {id:i,key:k,name:d.name,art:d.art,hp:h,maxHP:h,block:0,strength:0,weak:0,vulnerable:0,ritual:0,step:0,stunned:false,slow:0}}
 function legacyStartBattle(type){
  let sets={1:[['mite'],['marauder'],['archer','axe'],['mite','archer'],['marauder','axe']],2:[['feeder'],['whelp','silk'],['acolyte'],['feeder','whelp'],['silk']],3:[['vine'],['stone'],['stone','silk'],['vine','whelp'],['stone','vine']]};
- let group=type==='elite'?['sentinel']:type==='boss'?(S.act===1?['sentinel','mite']:S.act===2?['feeder','stone']:['sentinel','vine']):choice(sets[S.act]);
- S.enemies=group.map(makeEnemy);S.target=0;S.draw=shuffle(S.deck.map(c=>({...c})));S.discard=[];S.hand=[];S.exhaust=[];
+ let group=type==='elite'?['sentinel']:type==='boss'?(S.act===1?['sentinel','mite']:S.act===2?['feeder','stone']:['sentinel','vine']):choice(sets[S.act],'encounter');
+ S.enemies=group.map(makeEnemy);S.target=0;S.draw=shuffle(S.deck.map(c=>({...c})),'combat');S.discard=[];S.hand=[];S.exhaust=[];
  S.energy=3;S.block=0;S.strength=0;S.weak=0;S.vulnerable=0;S.frail=0;S.tangled=0;S.shrink=false;S.flame=0;S.rage=0;S.powers={};S.turn=1;S.canDraw=true;S.cardsPlayed=0;S.attacksPlayed=0;S.log=[];S.screen='battle';
  log(`Encounter: ${S.enemies.map(e=>e.name).join(' + ')}`);let innates=S.draw.filter(c=>spec(c).innate);S.draw=S.draw.filter(c=>!spec(c).innate);S.hand.push(...innates.slice(0,10));drawCards(Math.max(0,5-S.hand.length));}
-function drawCards(n,force=false){if(!S.canDraw&&!force){log('Cannot draw more cards this turn');return}for(let i=0;i<n;i++){if(S.hand.length>=10)break;if(!S.draw.length){if(!S.discard.length)break;S.draw=shuffle(S.discard.splice(0))}S.hand.push(S.draw.shift())}}
+function drawCards(n,force=false){if(!S.canDraw&&!force){log('Cannot draw more cards this turn');return}for(let i=0;i<n;i++){if(S.hand.length>=10)break;if(!S.draw.length){if(!S.discard.length)break;S.draw=shuffle(S.discard.splice(0),'combat')}S.hand.push(S.draw.shift())}}
 function gainBlock(amount){let n=Math.max(0,Math.floor(amount*(S.frail>0?.75:1)));S.block+=n;if(n>0&&S.powers.juggernaut){for(let i=0;i<S.powers.juggernaut;i++)dealRawToRandom(5)}log(`Gained ${n} Block`);return n}
 function dealRawToRandom(amount){let e=choice(alive());if(!e)return;hurtEnemy(e,amount,false)}
 function hurtEnemy(e,dmg,attack=true){if(!e||e.hp<=0)return 0;const blocked=Math.min(e.block,dmg);e.block-=blocked;let dealt=Math.min(e.hp,Math.max(0,dmg-blocked));e.hp-=dealt;queueFX(e.id,dealt,'hit',{blocked,incoming:dmg,style:attack?vfxStyleForCard(vfxActiveCard):'ember',source:'hero'});if(e.hp<=0)queueFX(e.id,0,'death',{style:attack?vfxStyleForCard(vfxActiveCard):'ember'});return dealt}
@@ -26,7 +26,7 @@ function triggerFX(){let jobs=fx.splice(0);for(let q of jobs){let sel=q.id==='he
 function exhaustCard(c){S.exhaust.push(c);if(S.powers.feel){gainBlock(S.powers.feel*3)}}
 function personalLoss(n){S.hp=Math.max(0,S.hp-n);log(`Lost ${n} HP`);if(S.powers.rupture)S.strength+=S.powers.rupture}
 function checkEndBattle(){if(S.hp<=0){S.screen='death';busy=false;return true}if(alive().length===0){S.defeated=S.enemies.map(x=>x.name).join(', ');S.clearCount++;S.hp=Math.min(S.maxHP,S.hp+6);S.rewardGold=S.room==='Boss'?45:S.room==='Elite'?32:17; // V1.16: loot is awarded only when its claim button is pressed.
-  S.offered=shuffle(POOL.filter(k=>CARDS[k].rarity!=='Rare')).slice(0,2).concat([choice(POOL.filter(k=>CARDS[k].rarity==='Rare'))]).map(newCard);
+  S.offered=shuffle(POOL.filter(k=>CARDS[k].rarity!=='Rare'),'reward').slice(0,2).concat([choice(POOL.filter(k=>CARDS[k].rarity==='Rare'),'reward')]).map(newCard);
   S.screen='reward';busy=false;return true}return false;}
 function playCard(id){if(S.screen!=='battle'||busy)return;let pos=S.hand.findIndex(c=>c.uid===id);if(pos<0)return;let c=S.hand[pos],d=spec(c),cost=updatedCost(c);if(cost!==-1&&cost>S.energy)return;
  let enemy=targetEnemy();if(d.type==='Attack'&&!enemy)return;
@@ -51,7 +51,7 @@ function playCard(id){if(S.screen!=='battle'||busy)return;let pos=S.hand.findInd
  if(c.key==='battletrance'){drawCards(c.up?4:3);S.canDraw=false}
  if(c.key==='offering'){personalLoss(6);S.energy+=2;drawCards(c.up?5:3)}
  if(c.key==='armaments'){if(c.up){S.hand.forEach(v=>{if(UP[v.key])v.up=true})}else if(S.hand.some(v=>!v.up&&UP[v.key])){modal={type:'upgradehand'}}}
- if(c.key==='truegrit'){if(c.up&&S.hand.length){modal={type:'chooseExhaust'}}else if(S.hand.length){exhaustCard(S.hand.splice(Math.floor(Math.random()*S.hand.length),1)[0])}}
+ if(c.key==='truegrit'){if(c.up&&S.hand.length){modal={type:'chooseExhaust'}}else if(S.hand.length){exhaustCard(S.hand.splice(Math.floor(ed127Roll('combat')*S.hand.length),1)[0])}}
  if(c.key==='feed'&&killed){let n=c.up?4:3;S.maxHP+=n;S.hp+=n;log(`Fatal: +${n} Max HP`)}
  if(d.type==='Power'){if(c.key!=='inflame')S.powers[c.key]=(S.powers[c.key]||0)+1}else if(d.exhaust){exhaustCard(c)}else S.discard.push(c);
  if(!S.enemies[S.target]||S.enemies[S.target].hp<=0)S.target=S.enemies.findIndex(e=>e.hp>0);

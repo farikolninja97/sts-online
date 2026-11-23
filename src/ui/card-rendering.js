@@ -47,6 +47,13 @@ function ed126CardVisual(c,d){
  const angle=20+(hash%140),p1=8+hash%55,p2=25+((hash>>8)%50),glow=.18+((hash>>12)%14)/100;
  return {family,symbol:base[0],label:base[1],tags,style:`--ed-card-h1:${h1};--ed-card-h2:${h2};--ed-card-angle:${angle}deg;--ed-card-p1:${p1}%;--ed-card-p2:${p2}%;--ed-card-glow:${glow};`};
 }
+function ed127CardArt(key){
+ // Every released card, including generated status/curse cards, has its own
+ // standalone local illustration. Never load externally or depend on hover.
+ const safe=String(key||'').toLowerCase();
+ if(!/^[a-z0-9]+$/.test(safe) || !CARDS[safe])return '';
+ return `<img class="ed127-card-illustration" src="./assets/card-art/${safe}.svg" alt="" aria-hidden="true" draggable="false" loading="eager" decoding="async">`;
+}
 function cardHTML(c,mode='hand'){
  let d=spec(c), cost=updatedCost(c), playable=mode!=='hand'||(S&&S.screen==='battle'&&!busy&&!d.unplayable&&(cost===-1||S.energy>=cost));
  let action=mode==='hand'?'play':mode==='reward'?'rewardcard':'inspectcard';
@@ -55,5 +62,5 @@ function cardHTML(c,mode='hand'){
  const badge=live?`<div class="v109-damage" role="note" aria-label="${escapeHTML(live.accessible)}" title="${escapeHTML(live.accessible)}"><b>⚔ ${live.perHit}</b>${live.hits>1?`<em>×${live.hits}</em>`:''}<small>${live.random?'RANDOM':live.hpLoss!==live.total?`${live.hpLoss} HP`:'LIVE'}</small></div>`:'';
  const vis=ed126CardVisual(c,d), rarity=(d.rarity||'Common').toLowerCase();
  const chips=vis.tags.map(t=>`<span class="ed126-card-chip">${escapeHTML(t)}</span>`).join('');
- return `<button class="card ed126-card type-${d.type.toLowerCase()} rarity-${rarity} family-${vis.family} ${c.up?'card-upgraded':''} ${!playable?'disabled':''} ${mode!=='hand'?'mini':''}" style="${vis.style}" ${!playable&&mode!=='hand'?'disabled':''} data-playable="${playable}" data-${action}="${escapeHTML(c.uid)}" aria-label="${escapeHTML(d.name+(c.up?' upgraded':'')+', '+d.desc+liveLabel)}"><span class="cost">${d.unplayable?'—':cost===-1?'X':cost}</span><div class="ed126-card-banner"><span class="ed126-card-affinity">${vis.symbol} ${vis.label}</span><span class="ed126-card-rarity">${escapeHTML(d.rarity)}</span></div><div class="card-title">${escapeHTML(d.name)}${c.up?'+':''}</div>${c.up?'<span class="upgrade-corner" aria-hidden="true">✦</span>':''}${mode==='hand'?`<span class="card-info-mark" data-card-info="${escapeHTML(c.uid)}" aria-hidden="true">i</span>`:''}<div class="art"><div class="ed126-art-back"></div><div class="ed126-sigil"><span>${vis.symbol}</span></div>${iconArt(d.icon)}${badge}</div><div class="ed126-card-tags">${chips}</div><div class="card-type">${d.type}</div><div class="card-desc">${live?liveCardDescription(d.desc,live):escapeHTML(d.desc)}</div><div class="rarity">${d.rarity}</div></button>`;
+ return `<button class="card ed126-card type-${d.type.toLowerCase()} rarity-${rarity} family-${vis.family} ${c.up?'card-upgraded':''} ${!playable?'disabled':''} ${mode!=='hand'?'mini':''}" style="${vis.style}" ${!playable&&mode!=='hand'?'disabled':''} data-playable="${playable}" data-${action}="${escapeHTML(c.uid)}" aria-label="${escapeHTML(d.name+(c.up?' upgraded':'')+', '+d.desc+liveLabel)}"><span class="cost">${d.unplayable?'—':cost===-1?'X':cost}</span><div class="ed126-card-banner"><span class="ed126-card-affinity">${vis.symbol} ${vis.label}</span><span class="ed126-card-rarity">${escapeHTML(d.rarity)}</span></div><div class="card-title">${escapeHTML(d.name)}${c.up?'+':''}</div>${c.up?'<span class="upgrade-corner" aria-hidden="true">✦</span>':''}${mode==='hand'?`<span class="card-info-mark" data-card-info="${escapeHTML(c.uid)}" aria-hidden="true">i</span>`:''}<div class="art">${ed127CardArt(c.key)}${badge}</div><div class="ed126-card-tags">${chips}</div><div class="card-type">${d.type}</div><div class="card-desc">${live?liveCardDescription(d.desc,live):escapeHTML(d.desc)}</div><div class="rarity">${d.rarity}</div></button>`;
 }

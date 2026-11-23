@@ -1,48 +1,39 @@
-# Ember Descent V1.25 — Run Chronicle Milestone
+# Ember Descent V1.27 — Shareable Runs, Daily Challenges & Illustrated Cards
 
-**Full GitHub Pages update** based on V1.24 Events & Treasures. Ironclad-only original browser roguelike. No server, Supabase, or SQL migration.
+## Milestones complete
 
-## Milestone delivered: persistent Run Chronicle
+### Unique, visible card artwork
+- **96 standalone card illustrations**, one for every card currently defined (starter, pool, special, Status, Curse).
+- Illustrations are displayed directly on cards in **hand, card rewards, upgrade previews, deck/pile displays, shops and the Card Compendium**, without hovering.
+- All files are local SVGs (no image hosting or network dependency). They are distinct icon-based fantasy compositions, not proprietary Slay the Spire 2 illustrations.
+- Compendium now has working **search, type and rarity filters**; names are visible below tiles. Mobile hands emphasize artwork instead of crowding the picture with descriptions.
 
-A finished run now creates a historical record **separate from the live-game save**, including:
+### Seeded run and replayability milestone
+- Custom seeds: enter a seed from a friend to recreate a run.
+- Random runs: share their generated seed.
+- Repeatable UTC daily challenge: same UTC calendar date gives the same daily seed on the same rules version.
+- Run Chronicle stores seeds; completed seeded runs can be replayed directly from their records.
+- Named RNG streams keep maps, encounters, reward choices, merchant offers, ancient boons and combat randomness distinct; visual-only effects do not influence game decisions.
+- Same game version, seed, and **same decisions** should reproduce outcomes. Choosing different paths or using cards in a different order can change subsequent outcomes.
 
-- Victory/defeat, act, floor, floors cleared, battles won, difficulty, and elapsed time
-- Final deck with card upgrades and Curses
-- Relics, remaining potions, Ancient choice history, and event/treasure journal
-- Gold, HP, damage dealt/taken/blocked, turns ended, and cards played (precise combat telemetry starts with new V1.25 runs; migrated runs are marked partial)
-- Run summary after victory or defeat and a detailed record viewer
-- Last 100 completed runs, win rate, highest climb, and total battles/floors from retained runs
-- 12 original achievement badges (display/progression only; **no official STS2 card unlocks**)
-
-The Chronicle is accessible from the **start screen** and the **Game Menu**. Live progress appears under **Menu → Current Run**. The end screen offers **View Run Chronicle** and **Start another run**. Duplicate recording is prevented on reload and repeated rendering.
+### Reliability fixes
+- Seed controls appear immediately on a fresh launch.
+- Card Compendium works before beginning a run, including its Close button.
+- Compendium search retains focus while typing; type and rarity filters work.
+- Existing run save key **`ember_descent_sts2_100` unchanged**; V1.25 history preserved.
 
 ## Install
-
 1. Extract the release ZIP.
-2. Open the `github-pages/` folder in the ZIP.
-3. Upload everything **inside** `github-pages/` into the root of `farikolninja97/sts-online` on your Pages branch, keeping `src/` and `styles/` subdirectories.
-4. Wait for your GitHub Pages deployment, then check that the footer says **V1.25**. Use Chrome Incognito to bypass older cached JavaScript without wiping local site storage.
+2. Copy **every file and folder inside `github-pages/`** into the root of your `sts-online` GitHub Pages repository.
+3. Preserve the folder structure, **especially `assets/card-art/`** and the CSS/JS files.
+4. Wait for deployment, open the website, and verify the footer displays **V1.27**. If Chrome shows an earlier build, check in Incognito.
 
-**Save compatibility:** The live save key remains `ember_descent_sts2_100`. The new Chronicle has a **separate localStorage key** (`ember_descent_run_chronicle_v1`). Old in-progress V1.24 saves are migrated without deleting their existing cards, relics, or journal. Only combat statistics accumulated after upgrading to V1.25 are counted for an old run.
+## Limitations
+- These are original Ember Descent daily-style challenges; no server-wide daily leaderboard, online synchronization, or official STS2 challenge system.
+- Seed reproducibility is tied to this build and RNG rule version R1. New game changes may require a new rules version.
+- Saved history and runs remain per-browser; clearing site storage can erase them.
+- Browser QA did not include a live GitHub Pages deployment or a physical iPhone Safari session.
+- Existing game systems are an original fan-game implementation and are not certified 1:1 copies of Slay the Spire 2.
 
-**Storage warning:** Chronicle data stays **only in that browser/site storage**, not in GitHub or cloud storage. Chrome and Safari have independent histories. Clearing site data or using private/incognito browsing can erase or discard the history. The in-game **Clear Chronicle** control requires confirmation and does not erase your live run.
-
-## What's unchanged
-
-- 52 enemy designs and 72 formations, original bosses and special AI
-- Ironclad card catalog, card upgrades, relics and potions
-- V1.23 Shrink and status-duration mechanics
-- V1.24 events, treasure, run journal, and map
-- Existing local save key and gameplay balance
-
-This is an original fan prototype, not a verified 1:1 recreation of Slay the Spire 2. Run Chronicle achievements are original to this game.
-
-## Source changes
-
-- `src/core/config.js` — visible version V1.25
-- `src/systems/game/run-chronicle-v125.js` — run telemetry, outcome archiving, permanent history, badges, UI
-- `styles/chronicle-v125.css` — responsive Chronicle, progress, and victory/defeat presentation
-- `index.html` — load the new script and style last
-- `github-pages/README.md` — install notes
-
-See `QA_REPORT_V1.25.md` and `V1.25_PRIORITY_CHECKLIST.md` for verification scope and remaining priorities.
+## Artwork licensing
+The original composition/backgrounds in `assets/card-art/` use recolored pictogram shapes from Font Awesome Free (Fonticons, Inc.), licensed CC BY 4.0. See [`CARD_ART_NOTICE.md`](CARD_ART_NOTICE.md).

@@ -73,7 +73,7 @@ function ed124SelectEvent(){
  S.ed124EventHistory??=[];
  const recent=S.ed124EventHistory.slice(-2).map(x=>x.key);
  const eligible=Object.keys(ED124_EVENTS).filter(k=>!recent.includes(k));
- const key=choice(eligible.length?eligible:Object.keys(ED124_EVENTS));
+ const key=choice(eligible.length?eligible:Object.keys(ED124_EVENTS),'event');
  S.ed124EventHistory.push({act:S.act,floor:S.floor,key});
  return {key,completed:false,choice:null,result:''};
 }
@@ -88,12 +88,12 @@ function ed124Remember(kind,title,description){
  if(S.ed124Journal.length>80)S.ed124Journal.splice(0,S.ed124Journal.length-80);
 }
 function ed124PickRelic(){const id=relicRoll();if(id){gainRelic(id);return `Received ${RELICS[id].name}.`;}return 'No unowned relics remain.';}
-function ed124PickRare(){const pool=SOLO_POOL.filter(k=>CARDS[k]?.rarity==='Rare');if(!pool.length)return 'No eligible Rare cards.';const c=newCard(choice(pool));S.deck.push(c);return `Added ${CARDS[c.key].name} to your permanent deck.`;}
+function ed124PickRare(){const pool=SOLO_POOL.filter(k=>CARDS[k]?.rarity==='Rare');if(!pool.length)return 'No eligible Rare cards.';const c=newCard(choice(pool,'event'));S.deck.push(c);return `Added ${CARDS[c.key].name} to your permanent deck.`;}
 function ed124ApplyEventAction(id,selectedUid){
  let text='';const card=selectedUid?S.deck.find(c=>c.uid===selectedUid):null;
  switch(id){
   case 'blood_gold':S.hp-=6;S.gold+=80;text='Lost 6 HP and gained 80 Gold.';break;
-  case 'random_smith':{const c=choice(ed124DeckCandidates('upgrade'));if(!c)return null;c.up=true;text=`Upgraded ${CARDS[c.key].name}.`;break;}
+  case 'random_smith':{const c=choice(ed124DeckCandidates('upgrade'),'event');if(!c)return null;c.up=true;text=`Upgraded ${CARDS[c.key].name}.`;break;}
   case 'mirror_copy':{if(!card)return null;S.hp-=8;const copy=newCard(card.key);copy.up=!!card.up;S.deck.push(copy);text=`Lost 8 HP and duplicated ${CARDS[card.key].name}${copy.up?'+':''}.`;break;}
   case 'mirror_erase':case 'archive_remove':{if(!card||!ed124Removable(card))return null;const cost=id==='mirror_erase'?35:25;S.gold-=cost;S.deck.splice(S.deck.indexOf(card),1);text=`Paid ${cost} Gold and removed ${CARDS[card.key].name}.`;break;}
   case 'armory_relic':S.hp-=10;text=`Lost 10 HP. ${ed124PickRelic()}`;break;
@@ -101,12 +101,12 @@ function ed124ApplyEventAction(id,selectedUid){
   case 'stall_potion':{const potion=edOfferPotion();if(!potion||!edGivePotion(potion))return null;text=`Collected ${ED_POTIONS[potion].name}.`;break;}
   case 'stall_rare':S.gold-=65;text=`Paid 65 Gold. ${ed124PickRare()}`;break;
   case 'grove_rest':{S.gold-=30;const restored=Math.min(25,S.maxHP-S.hp);S.hp+=restored;text=`Paid 30 Gold and restored ${restored} HP.`;break;}
-  case 'grove_curse':{const restored=Math.min(35,S.maxHP-S.hp);S.hp+=restored;const curse=newCard(choice(ED124_CURSES));S.deck.push(curse);text=`Restored ${restored} HP and added ${CARDS[curse.key].name} to your deck.`;break;}
+  case 'grove_curse':{const restored=Math.min(35,S.maxHP-S.hp);S.hp+=restored;const curse=newCard(choice(ED124_CURSES,'event'));S.deck.push(curse);text=`Restored ${restored} HP and added ${CARDS[curse.key].name} to your deck.`;break;}
   case 'vault_gold':S.hp-=10;S.gold+=90;text='Lost 10 HP and gained 90 Gold.';break;
   case 'vault_relic':S.gold-=65;text=`Paid 65 Gold. ${ed124PickRelic()}`;break;
   case 'workshop_upgrade':{if(!card||card.up||!UP[card.key])return null;S.hp-=4;card.up=true;text=`Lost 4 HP and upgraded ${CARDS[card.key].name}.`;break;}
   case 'workshop_purge':{if(!card||CARDS[card.key]?.type!=='Curse'||!ed124Removable(card))return null;S.deck.splice(S.deck.indexOf(card),1);const healed=Math.min(10,S.maxHP-S.hp);S.hp+=healed;text=`Removed ${CARDS[card.key].name} and restored ${healed} HP.`;break;}
-  case 'archive_rare':{text=ed124PickRare();const curse=newCard(choice(ED124_CURSES));S.deck.push(curse);text+=` Also acquired ${CARDS[curse.key].name}.`;break;}
+  case 'archive_rare':{text=ed124PickRare();const curse=newCard(choice(ED124_CURSES,'event'));S.deck.push(curse);text+=` Also acquired ${CARDS[curse.key].name}.`;break;}
   case 'shrine_hp':S.gold-=60;S.maxHP+=6;S.hp+=6;text='Paid 60 Gold. Gained 6 Max HP and restored 6 HP.';break;
   case 'shrine_relic':S.maxHP-=5;S.hp=Math.min(S.hp,S.maxHP);text=`Lost 5 Max HP. ${ed124PickRelic()}`;break;
   case 'leave':text='Left without taking a bargain.';break;
