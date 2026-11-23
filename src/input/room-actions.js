@@ -1,6 +1,7 @@
 // Game buttons, card selections and map click actions.
 function act(action){if(action==='map'&&S){modal={type:'map'};render();return}if(action==='new'||action==='restart'){newGame();return}if(action==='how'){modal={type:'how'};render();return}if(!S)return;
  if(action==='menu'||action==='deck'||action==='piles'){modal={type:action};render();return}
+ if(action==='library'){modal={type:'catalog',query:'',typeFilter:'All',rarityFilter:'All'};render();return}
  if(action==='close'||action==='choicecancel'){modal=null;render();return}
  if(action==='end'){endTurn();return}
  if(action==='skipreward'||action==='leave'){moveToNext();return}
